@@ -1,0 +1,13 @@
+Package: statskier2
+Type: Package
+Title: Statistical Skier Tools
+Version: 0.1
+Imports:
+  dplyr,
+  stringr
+Date: 2015-12-08
+Author: Joran Elias
+Maintainer: Joran Elias <statisticalskier@gmail.com>
+Description: Complete rewrite of functions and tools for Statistcal Skier
+License: GPL
+LazyData: TRUE
