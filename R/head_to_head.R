@@ -36,10 +36,17 @@ hth_dst <- function(ath1,
       select(raceid,date,season,tech,start,
              fisid,name,rank,time,fispoints,mpb)
 
+    winning_times <- tbl(src = src,"main") %>%
+      filter(raceid %in% ath1_data$raceid) %>%
+      group_by(raceid) %>%
+      summarise(winning_time = min(time)) %>%
+      collect()
+
     ath2_data <- tbl(src = src,"main") %>%
       filter(name %in% ath2 &
                cat1 %in% MAJ_INT &
-               type == 'Distance') %>%
+               type == 'Distance' &
+               raceid %in% ath1_data$raceid) %>%
       collect() %>%
       mpb() %>%
       standardize_mpb() %>%
@@ -49,12 +56,13 @@ hth_dst <- function(ath1,
     ath_data <- inner_join(ath1_data,
                            ath2_data,
                            by = c('raceid','date','season','tech','start')) %>%
+      left_join(winning_times,by = "raceid") %>%
       mutate(start = ifelse(start == 'Pursuit','Mass',start),
              drank = rank.y - rank.x,
              dtime = time.y - time.x,
              dfispoints = fispoints.y - fispoints.x,
              dmpb = mpb.y - mpb.x,
-             dpb = 100 * (time.y - time.x) / time.x) %>%
+             dpb = 100 * (time.y - time.x) / winning_time) %>%
       select(raceid,date,season,tech,start,fisid.x,name.x,
              fisid.y,name.y,drank,dtime,dfispoints,dmpb,dpb)
   }
@@ -66,9 +74,16 @@ hth_dst <- function(ath1,
       select(raceid,date,season,tech,start,
              fisid,name,rank,time,fispoints)
 
+    winning_times <- tbl(src = src,"main") %>%
+      filter(raceid %in% ath1_data$raceid) %>%
+      group_by(raceid) %>%
+      summarise(winning_time = min(time)) %>%
+      collect()
+
     ath2_data <- tbl(src = src,"main") %>%
       filter(name %in% ath2 &
-               type == 'Distance') %>%
+               type == 'Distance' &
+               raceid %in% ath1_data$raceid) %>%
       collect() %>%
       select(raceid,date,season,tech,start,
              fisid,name,rank,time,fispoints)
@@ -76,11 +91,12 @@ hth_dst <- function(ath1,
     ath_data <- inner_join(ath1_data,
                            ath2_data,
                            by = c('raceid','date','season','tech','start')) %>%
+      left_join(winning_times,by = "raceid") %>%
       mutate(start = ifelse(start == 'Pursuit','Mass',start),
              drank = rank.y - rank.x,
              dtime = time.y - time.x,
              dfispoints = fispoints.y - fispoints.x,
-             dpb = 100 * (time.y - time.x) / time.x) %>%
+             dpb = 100 * (time.y - time.x) / winning_time) %>%
       select(raceid,date,season,tech,start,fisid.x,name.x,
              fisid.y,name.y,drank,dtime,dfispoints,dpb)
   }
@@ -142,6 +158,12 @@ hth_dst <- function(ath1,
   block$xmx <- as.Date(block$xmx)
 
   color_label <- c('Technique','Race Type','')[c(by_tech,by_start,(!by_tech & !by_start))]
+  y_label <- switch(measure,
+                    "fispoints" = "Difference in FIS Points",
+                    "rank" = "Difference in Finishing Place",
+                    "time" = "Difference in Time",
+                    "pb" = "Difference in % Back",
+                    "mpb" = "Difference in MPB")
 
   p <- ggplot() +
     facet_wrap(~facet_name) +
@@ -154,7 +176,7 @@ hth_dst <- function(ath1,
     geom_point(data = ath_data,aes(x = as.Date(date),y = y)) +
     line_piece +
     labs(x = NULL,
-         y = NULL,
+         y = y_label,
          fill = "",
          color = color_label) +
     theme(legend.position = "bottom",
