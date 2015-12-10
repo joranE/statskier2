@@ -31,7 +31,7 @@ mpb <- function(race_data){
 #'
 #' Standardize by season, gender and race type
 #'
-#' @param race_data
+#' @param race_data data frame
 #' @export
 standardize_mpb <- function(race_data){
   if (!all(c('mpb','gender','start','season') %in% colnames(race_data))){
