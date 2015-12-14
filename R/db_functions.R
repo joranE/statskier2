@@ -3,7 +3,7 @@
 #' @export
 #' @import RSQLite
 db_xc_local <- function(){
-  dbConnect(SQLite(), statskier2::sqlite_path)
+  dbConnect(SQLite(), options()$sqlite_path)
 }
 
 #' Create Remote XC DB Connection

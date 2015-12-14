@@ -11,8 +11,6 @@ MAJ_INT <- c('WC','OWG','WSC','TDS')
 #' @export
 .dbm <- "~/Dropbox/SkiingResults/misc"
 
-sqlite_path <- "~/Dropbox/UM/Packages/db/fis_new.db"
-
 # .onLoad <- function(libname,pkgname){
 #   #Current options
 #   op <- options()
