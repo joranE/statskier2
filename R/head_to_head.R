@@ -16,7 +16,12 @@ hth_dst <- function(ath1,
                     measure = c("fispoints","rank","time","pb","mpb"),
                     by_tech = FALSE,
                     by_start = FALSE){
-  src <- src_sqlite(path = statskier2::sqlite_path,create = FALSE)
+  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
+
+  if (ath1 %in% ath2){
+    ath2 <- setdiff(ath2,ath1)
+    warning("Removing ath1 from ath2 names.")
+  }
 
   races <- match.arg(races)
   measure <- match.arg(measure)
@@ -102,7 +107,7 @@ hth_dst <- function(ath1,
   }
 
   ath_data$facet_name <- paste(extract_all_caps(ath1),
-                               extract_all_caps(ath_data$name.y),
+                               ath_data$name.y,
                                sep = " vs. ")
   ath_data[['y']] <- ath_data[[paste0('d',measure)]]
 
@@ -202,7 +207,7 @@ hth_spr <- function(ath1,
                     races = c("maj_int","fis"),
                     measure = c("fispoints","rank"),
                     by_tech = FALSE){
-  src <- src_sqlite(path = statskier2::sqlite_path,create = FALSE)
+  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
 
   races <- match.arg(races)
   measure <- match.arg(measure)

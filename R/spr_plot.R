@@ -1,7 +1,7 @@
 #' @importFrom RColorBrewer brewer.pal
 #' @export
 spr_plot <- function(ath_names,by_tech = FALSE){
-  src <- src_sqlite(path = statskier2::sqlite_path,create = FALSE)
+  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
 
   if (length(ath_names) == 1){
     ath_names <- c(ath_names,ath_names)

@@ -9,7 +9,7 @@
 #' @import ggplot2
 #' @export
 race_snapshot_dst <- function(race_id,cutoff = 365 * 4,reduced = TRUE){
-  src <- src_sqlite(path = statskier2::sqlite_path,create = FALSE)
+  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
 
   cur_race <- tbl(src = src,"main") %>%
     filter(raceid == race_id) %>%
@@ -167,7 +167,7 @@ race_snapshot_dst <- function(race_id,cutoff = 365 * 4,reduced = TRUE){
 #' @import ggplot2
 #' @export
 race_snapshot_spr <- function(race_id,cutoff = 365 * 4,reduced = TRUE){
-  src <- src_sqlite(path = statskier2::sqlite_path,create = FALSE)
+  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
 
   cur_race <- tbl(src = src,"main") %>%
     filter(raceid == race_id) %>%

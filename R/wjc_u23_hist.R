@@ -4,7 +4,7 @@
 #' @param races character; one of "WJC" or "U23"
 #' @export
 wjc_u23_plot <- function(nations,races = c('WJC','U23')){
-  src <- src_sqlite(path = statskier2::sqlite_path,create = FALSE)
+  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
 
   races <- match.arg(races)
   wjc <- tbl(src = src,"main") %>%

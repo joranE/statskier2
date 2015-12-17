@@ -10,7 +10,7 @@
 nation_trend <- function(nations,
                          race_gender = c('Men','Women'),
                          race_type = c('Distance','Sprint')){
-  src <- src_sqlite(path = statskier2::sqlite_path,create = FALSE)
+  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
 
   if (length(nations) == 1){
     nations <- c(nations,nations)

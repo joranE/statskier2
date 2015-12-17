@@ -9,7 +9,7 @@ mpb <- function(race_data){
   if (!all(c('raceid','time') %in% colnames(race_data))){
     stop("\nError: Requires time, raceid columns.")
   }
-  src <- src_sqlite(path = statskier2::sqlite_path,create = FALSE)
+  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
   races <- unique(race_data$raceid)
   if (length(races) == 1){
     races <- c(races,races)
@@ -37,7 +37,7 @@ standardize_mpb <- function(race_data){
   if (!all(c('mpb','gender','start','season') %in% colnames(race_data))){
     stop("\nRequires mpb,gender,season and start columns.")
   }
-  src <- src_sqlite(path = statskier2::sqlite_path,create = FALSE)
+  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
   conv_fac <- tbl(src = src,from = "xc_fac") %>%
     collect()
   res <- race_data %>%
