@@ -53,6 +53,34 @@ update_race_url <- function(raceid,url1 = NA,url2 = NA){
   }
 }
 
+#' Insert Race URLs
+#'
+#' @param raceid integer race id
+#' @param url1 character
+#' @param url2 character
+#' @export
+#' @family race info functions
+insert_race_url <- function(raceid,url1 = NA,url2 = NA){
+  con_local <- db_xc_local()
+  con_remote <- db_xc_remote()
+  current <- ss_query(con_local,sprintf("select * from race_url where raceid = %s",raceid))
+  if (nrow(current) > 0){
+    stop("That raceid already exists in race_url table.")
+  }
+  if (is.na(url1)){
+    stop("Must provide at least url1.")
+  }
+  if (!is.na(url2)){
+    q <- sprintf("insert into race_url values (%s,'%s','%s')",raceid,url1,url2)
+    ss_query(con_local,q)
+    ss_query(con_remote,q)
+  }else{
+    q <- sprintf("insert into race_url values (%s,'%s',NULL)",raceid,url1,url2)
+    ss_query(con_local,q)
+    ss_query(con_remote,q)
+  }
+}
+
 missing_race_url <- function(){
   src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
 
