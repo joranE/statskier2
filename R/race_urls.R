@@ -79,6 +79,8 @@ insert_race_url <- function(raceid,url1 = NA,url2 = NA){
     ss_query(con_local,q)
     ss_query(con_remote,q)
   }
+  dbDisconnect(con_local)
+  dbDisconnect(con_remote)
 }
 
 missing_race_url <- function(){
@@ -94,4 +96,32 @@ missing_race_url <- function(){
     collect() %>%
     as.data.frame()
   missing_url
+}
+
+#' @export
+fill_missing_url <- function(){
+  todo <- missing_race_url() %>%
+    arrange(season,date)
+  n <- nrow(todo)
+
+  for (i in seq_len(n)){
+    rec <- todo[i,]
+    print(rec)
+    choice <- menu(choices = c('Continue','Skip','Exit'))
+    if (choice == 2){
+      next
+    }
+    if (choice == 3){
+      break
+    }else{
+      if (rec$type == 'Sprint'){
+        url1 <- readline(prompt = "url1: ")
+        url2 <- readline(prompt = "url2: ")
+        insert_race_url(raceid = rec$raceid,url1 = url1,url2 = url2)
+      }else{
+        url1 <- readline(prompt = "url1: ")
+        insert_race_url(raceid = rec$raceid,url1 = url1)
+      }
+    }
+  }
 }
