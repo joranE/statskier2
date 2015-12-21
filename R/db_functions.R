@@ -29,3 +29,15 @@ db_xc_remote <- function(){
 ss_query <- function(con,q){
   dbGetQuery(con,q)
 }
+
+#' @export
+update_race <- function(qry){
+  conl <- db_xc_local()
+  conr <- db_xc_remote()
+
+  ss_query(conl,qry)
+  ss_query(conr,qry)
+
+  dbDisconnect(conl)
+  dbDisconnect(conr)
+}
