@@ -62,9 +62,9 @@ ath_plot_dst <- function(ath_names,
   ath_summary$date <- as.Date(ath_summary$date)
 
   ath_data$name <- factor(ath_data$name,
-                          levels = ath_names)
+                          levels = unique(ath_names))
   ath_summary$name <- factor(ath_summary$name,
-                             levels = ath_names)
+                             levels = unique(ath_names))
 
   if (by_tech){
     line_piece <- geom_line(data = ath_summary,
@@ -143,9 +143,9 @@ ath_plot_spr <- function(ath_names,
   ath_summary$date <- as.Date(ath_summary$date)
 
   ath_data$name <- factor(ath_data$name,
-                          levels = ath_names)
+                          levels = unique(ath_names))
   ath_summary$name <- factor(ath_summary$name,
-                          levels = ath_names)
+                          levels = unique(ath_names))
 
   if (by_tech){
     line_piece <- geom_line(data = ath_summary,
