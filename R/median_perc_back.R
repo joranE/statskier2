@@ -29,7 +29,8 @@ mpb <- function(race_data){
 
 #' Standardize Median Percent Back
 #'
-#' Standardize by season, gender and race type
+#' Standardize median percent back by
+#' season, gender and race type
 #'
 #' @param race_data data frame
 #' @export

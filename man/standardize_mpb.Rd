@@ -10,6 +10,7 @@ standardize_mpb(race_data)
 \item{race_data}{data frame}
 }
 \description{
-Standardize by season, gender and race type
+Standardize median percent back by
+season, gender and race type
 }
 
