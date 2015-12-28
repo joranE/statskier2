@@ -1,6 +1,6 @@
 #' Generate ELO Distance Input Data
 #'
-#' @param default_rating
+#' @param default_rating skiers default rating
 #' @export
 dst_elo_data <- function(default_rating = 1300){
   src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
@@ -28,7 +28,7 @@ dst_elo_data <- function(default_rating = 1300){
 
 #' Generate ELO Sprint Input Data
 #'
-#' @param default_rating
+#' @param default_rating skiers default rating
 #' @export
 spr_elo_data <- function(default_rating = 1300){
   src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)

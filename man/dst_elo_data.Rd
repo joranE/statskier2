@@ -6,6 +6,9 @@
 \usage{
 dst_elo_data(default_rating = 1300)
 }
+\arguments{
+\item{default_rating}{skiers default rating}
+}
 \description{
 Generate ELO Distance Input Data
 }

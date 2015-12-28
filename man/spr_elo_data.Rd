@@ -6,6 +6,9 @@
 \usage{
 spr_elo_data(default_rating = 1300)
 }
+\arguments{
+\item{default_rating}{skiers default rating}
+}
 \description{
 Generate ELO Sprint Input Data
 }
