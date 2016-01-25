@@ -83,6 +83,7 @@ insert_race_url <- function(raceid,url1 = NA,url2 = NA){
   dbDisconnect(con_remote)
 }
 
+#' @export
 missing_race_url <- function(){
   src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
 
