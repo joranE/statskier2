@@ -4,11 +4,14 @@
 #' @param races character; either "maj_int" or "fis"
 #' @param by_tech boolean; summarise by season or by season and technique
 #' @param collapse names list of athletes to collapse into a single panel
+#' @param use_rank boolean; if \code{TRUE} use rank instead of mpb when
+#' races = "maj_int". Has no effect if races = "fis".
 #' @export
 ath_plot_dst <- function(ath_names,
                          races = c("maj_int","fis"),
                          by_tech = FALSE,
-                         collapse = NULL){
+                         collapse = NULL,
+                         use_rank = FALSE){
   src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
 
   if (length(ath_names) == 1){
@@ -37,8 +40,13 @@ ath_plot_dst <- function(ath_names,
   }
 
   if (races == "maj_int"){
-    ath_data$y <- ath_data$mpb
-    ylab <- "Standardized % Back From Median Skier"
+    if (use_rank){
+      ath_data$y <- ath_data$rank
+      ylab <- "Finishing Place"
+    }else{
+      ath_data$y <- ath_data$mpb
+      ylab <- "Standardized % Back From Median Skier"
+    }
   }else{
     ath_data$y <- ath_data$fispoints
     ylab <- "FIS Points"
