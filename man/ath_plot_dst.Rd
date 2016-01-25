@@ -5,7 +5,7 @@
 \title{Distance Results Plots}
 \usage{
 ath_plot_dst(ath_names, races = c("maj_int", "fis"), by_tech = FALSE,
-  collapse = NULL)
+  collapse = NULL, use_rank = FALSE)
 }
 \arguments{
 \item{ath_names}{character vector of athlete names}
@@ -15,6 +15,9 @@ ath_plot_dst(ath_names, races = c("maj_int", "fis"), by_tech = FALSE,
 \item{by_tech}{boolean; summarise by season or by season and technique}
 
 \item{collapse}{names list of athletes to collapse into a single panel}
+
+\item{use_rank}{boolean; if \code{TRUE} use rank instead of mpb when
+races = "maj_int". Has no effect if races = "fis".}
 }
 \description{
 Distance Results Plots
