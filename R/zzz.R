@@ -11,37 +11,15 @@ MAJ_INT <- c('WC','OWG','WSC','TDS')
 #' @export
 .dbm <- "~/Dropbox/SkiingResults/misc"
 
-sqlite_path <- options()$sqlite_path
+.onAttach <- function(libname,pkgname){
+  src <- choose_src()
+  options(statskier_src = src)
+  invisible()
+}
 
-# .onLoad <- function(libname,pkgname){
-#   #Current options
-#   op <- options()
-#
-#   #Attempt connections
-#   con_remote <- tryCatch({RMySQL::dbConnect(drv = RMySQL::MySQL(),
-#                                             dbname = options()$mysql$dbName,
-#                                             username = options()$mysql$user,
-#                                             password = options()$mysql$password,
-#                                             host = options()$mysql$host,
-#                                             port = options()$mysql$port)},
-#                          error = function(e) e)
-#   con_local <- tryCatch({RSQLite::dbConnect(RSQLite::SQLite(),
-#                                             sqlite_path)},
-#                         error = function(e) e)
-#
-#   if (!inherits(con_remote,"MySQLConnection")){
-#     cat(con_remote$message)
-#     con_remote <- NULL
-#   }
-#   if(!inherits(con_local,"SQLiteConnection")){
-#     cat(con_local$message)
-#     con_local <- NULL
-#   }
-#   op.statskier <- list(
-#     statskier_remote = con_remote,
-#     statskier_local = con_local
-#   )
-#   #toset <- !(names(op.statskier) %in% names(op))
-#   options(op.statskier)
-#   invisible()
-# }
+.onDetach <- function(libpath){
+  if (!is.null(options()$statskier_src) && inherits(options()$statskier_src,"src_mysql")){
+    DBI::dbDisconnect(options()$statskier_src$con)
+  }
+  invisible()
+}

@@ -1,8 +1,7 @@
 #' @importFrom RColorBrewer brewer.pal
 #' @export
 spr_plot <- function(ath_names,by_tech = FALSE){
-  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
-
+  
   if (length(ath_names) == 1){
     ath_names <- c(ath_names,ath_names)
   }
@@ -15,7 +14,7 @@ spr_plot <- function(ath_names,by_tech = FALSE){
     facet <- facet_wrap(~name)
   }
 
-  ath_data <- tbl(src = src,"main") %>%
+  ath_data <- tbl(src = options()$statskier_src,"main") %>%
     filter(cat1 %in% MAJ_INT &
              name %in% ath_names &
              type == 'Sprint' &
@@ -53,7 +52,6 @@ spr_plot <- function(ath_names,by_tech = FALSE){
     scale_fill_manual(values = RColorBrewer::brewer.pal(6,"Blues")[3:6],
                       breaks = c('4 Final','3 Semi','2 Quarter','1 Qual')) +
     theme(axis.text.x = element_text(hjust = 0,vjust = 1,angle = 310))
-
 
   return(list(plot = p,
               ath_data = ath_data))

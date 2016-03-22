@@ -12,8 +12,7 @@ ath_plot_dst <- function(ath_names,
                          by_tech = FALSE,
                          collapse = NULL,
                          use_rank = FALSE){
-  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
-
+  
   if (length(ath_names) == 1){
     ath_names <- c(ath_names,ath_names)
   }
@@ -22,7 +21,7 @@ ath_plot_dst <- function(ath_names,
     races <- "maj_int"
   }
 
-  ath_data <- tbl(src = src,"main") %>%
+  ath_data <- tbl(src = options()$statskier_src,"main") %>%
     filter(name %in% ath_names &
              type == 'Distance') %>%
     collect() %>%
@@ -109,8 +108,7 @@ ath_plot_spr <- function(ath_names,
                          races = c("maj_int","fis"),
                          by_tech = FALSE,
                          collapse = NULL){
-  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
-
+  
   if (length(ath_names) == 1){
     ath_names <- c(ath_names,ath_names)
   }
@@ -119,7 +117,7 @@ ath_plot_spr <- function(ath_names,
     races <- "maj_int"
   }
 
-  ath_data <- tbl(src = src,"main") %>%
+  ath_data <- tbl(src = options()$statskier_src,"main") %>%
     filter(name %in% ath_names &
              type == 'Sprint') %>%
     collect() %>%

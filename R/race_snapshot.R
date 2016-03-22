@@ -9,9 +9,8 @@
 #' @import ggplot2
 #' @export
 race_snapshot_dst <- function(race_id,cutoff = 365 * 4,reduced = TRUE){
-  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
 
-  cur_race <- tbl(src = src,"main") %>%
+  cur_race <- tbl(src = options()$statskier_src,"main") %>%
     filter(raceid == race_id) %>%
     arrange(rank) %>%
     collect() %>%
@@ -45,7 +44,7 @@ race_snapshot_dst <- function(race_id,cutoff = 365 * 4,reduced = TRUE){
 
   cutoff_date <- as.character(as.Date(race_date) - cutoff)
 
-  race_history <- tbl(src = src,"main") %>%
+  race_history <- tbl(src = options()$statskier_src,"main") %>%
     filter(cat1 %in% MAJ_INT &
              name %in% cur_race$name &
              type == 'Distance' &
@@ -167,9 +166,8 @@ race_snapshot_dst <- function(race_id,cutoff = 365 * 4,reduced = TRUE){
 #' @import ggplot2
 #' @export
 race_snapshot_spr <- function(race_id,cutoff = 365 * 4,reduced = TRUE){
-  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
-
-  cur_race <- tbl(src = src,"main") %>%
+  
+  cur_race <- tbl(src = options()$statskier_src,"main") %>%
     filter(raceid == race_id) %>%
     arrange(rank) %>%
     collect() %>%
@@ -188,7 +186,7 @@ race_snapshot_spr <- function(race_id,cutoff = 365 * 4,reduced = TRUE){
 
   cutoff_date <- as.character(as.Date(race_date) - cutoff)
 
-  race_history <- tbl(src = src,"main") %>%
+  race_history <- tbl(src = options()$statskier_src,"main") %>%
     filter(cat1 %in% MAJ_INT &
              name %in% cur_race$name &
              type == 'Sprint' &

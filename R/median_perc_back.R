@@ -9,13 +9,13 @@ mpb <- function(race_data){
   if (!all(c('raceid','time') %in% colnames(race_data))){
     stop("\nError: Requires time, raceid columns.")
   }
-  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
+  
   races <- unique(race_data$raceid)
   if (length(races) == 1){
     races <- c(races,races)
   }
 
-  race_medians <- tbl(src = src,from = "median_race_time") %>%
+  race_medians <- tbl(src = options()$statskier_src,from = "median_race_time") %>%
     filter(raceid %in% races) %>%
     collect()
 
@@ -24,6 +24,7 @@ mpb <- function(race_data){
     mutate(mpb = round((time - median_time) / median_time,6) * 100) %>%
     select(-median_time) %>%
     as.data.frame()
+    
   res
 }
 
@@ -36,10 +37,10 @@ mpb <- function(race_data){
 #' @export
 standardize_mpb <- function(race_data){
   if (!all(c('mpb','gender','start','season') %in% colnames(race_data))){
-    stop("\nRequires mpb,gender,season and start columns.")
+    stop("\nRequires mpb,gender,season#tart columns.")
   }
-  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
-  conv_fac <- tbl(src = src,from = "xc_fac") %>%
+  
+  conv_fac <- tbl(src = options()$statskier_src,from = "xc_fac") %>%
     collect()
   res <- race_data %>%
     left_join(conv_fac,by = c('season','gender','start')) %>%

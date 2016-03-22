@@ -3,9 +3,8 @@
 #' @param default_rating skiers default rating
 #' @export
 dst_elo_data <- function(default_rating = 1300){
-  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
-
-  dst <- tbl(src = src,"main") %>%
+  
+  dst <- tbl(src = options()$statskier_src,"main") %>%
     filter(type == 'Distance') %>%
     arrange(date,raceid,rank) %>%
     collect()
@@ -31,9 +30,8 @@ dst_elo_data <- function(default_rating = 1300){
 #' @param default_rating skiers default rating
 #' @export
 spr_elo_data <- function(default_rating = 1300){
-  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
-
-  spr <- tbl(src = src,"main") %>%
+  
+  spr <- tbl(src = options()$statskier_src,"main") %>%
     filter(type == 'Sprint') %>%
     arrange(date,raceid,rank) %>%
     collect()

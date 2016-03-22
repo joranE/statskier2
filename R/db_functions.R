@@ -30,3 +30,21 @@ ss_query <- function(con,q){
   dbGetQuery(con,q)
 }
 
+choose_src <- function(){
+  if (!is.null(options()$sqlite_path) && file.exists(options()$sqlite_path)){
+    src <- src_sqlite(path = options()$sqlite_path,create = FALSE)
+  }else{
+    if (!is.null(options()$mysql)){
+      src <- src_mysql(dbname = options()$mysql$dbName,
+                       host = options()$mysql$host,
+                       port = options()$mysql$port,
+                       user = options()$mysql$user,
+                       password = options()$mysql$password)
+    }else{
+      warning("Neither sqlite_path nor mysql are set in options().",call. = FALSE)
+      return(NULL)
+    }
+  }
+  src
+}
+

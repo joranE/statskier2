@@ -85,9 +85,8 @@ insert_race_url <- function(raceid,url1 = NA,url2 = NA){
 
 #' @export
 missing_race_url <- function(){
-  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
-
-  missing_url <- left_join(tbl(src = src,
+  
+  missing_url <- left_join(tbl(src = options()$statskier_src,
                                from = sql("select distinct raceid,season,date,gender,
                                           location,type,cat1,cat2,length,tech,start
                                           from main")),

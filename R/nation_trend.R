@@ -10,8 +10,7 @@
 nation_trend <- function(nations,
                          race_gender = c('Men','Women'),
                          race_type = c('Distance','Sprint')){
-  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
-
+  
   if (length(nations) == 1){
     nations <- c(nations,nations)
   }
@@ -19,7 +18,7 @@ nation_trend <- function(nations,
   race_gender <- match.arg(race_gender)
   race_type <- match.arg(race_type)
 
-  nation_data <- tbl(src = src,"main") %>%
+  nation_data <- tbl(src = options()$statskier_src,"main") %>%
     filter(cat1 %in% MAJ_INT &
              nation %in% nations &
              type == race_type &
@@ -27,7 +26,7 @@ nation_trend <- function(nations,
     select(season,start,nation,rank) %>%
     collect()
 
-  race_data <- tbl(src = src,"main") %>%
+  race_data <- tbl(src = options()$statskier_src,"main") %>%
     filter(cat1 %in% MAJ_INT &
              type == race_type &
              gender == race_gender) %>%

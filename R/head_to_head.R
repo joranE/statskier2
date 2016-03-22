@@ -16,8 +16,7 @@ hth_dst <- function(ath1,
                     measure = c("fispoints","rank","time","pb","mpb"),
                     by_tech = FALSE,
                     by_start = FALSE){
-  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
-
+  
   if (ath1 %in% ath2){
     ath2 <- setdiff(ath2,ath1)
     warning("Removing ath1 from ath2 names.")
@@ -31,7 +30,7 @@ hth_dst <- function(ath1,
   }
 
   if (races == "maj_int"){
-    ath1_data <- tbl(src = src,"main") %>%
+    ath1_data <- tbl(src = options()$statskier_src,"main") %>%
       filter(name == ath1 &
                cat1 %in% MAJ_INT &
                type == 'Distance') %>%
@@ -41,13 +40,13 @@ hth_dst <- function(ath1,
       select(raceid,date,season,tech,start,
              fisid,name,rank,time,fispoints,mpb)
 
-    winning_times <- tbl(src = src,"main") %>%
+    winning_times <- tbl(src = options()$statskier_src,"main") %>%
       filter(raceid %in% ath1_data$raceid) %>%
       group_by(raceid) %>%
       summarise(winning_time = min(time)) %>%
       collect()
 
-    ath2_data <- tbl(src = src,"main") %>%
+    ath2_data <- tbl(src = options()$statskier_src,"main") %>%
       filter(name %in% ath2 &
                cat1 %in% MAJ_INT &
                type == 'Distance' &
@@ -72,20 +71,20 @@ hth_dst <- function(ath1,
              fisid.y,name.y,drank,dtime,dfispoints,dmpb,dpb)
   }
   if (races == "fis"){
-    ath1_data <- tbl(src = src,"main") %>%
+    ath1_data <- tbl(src = options()$statskier_src,"main") %>%
       filter(name == ath1 &
                type == 'Distance') %>%
       collect() %>%
       select(raceid,date,season,tech,start,
              fisid,name,rank,time,fispoints)
 
-    winning_times <- tbl(src = src,"main") %>%
+    winning_times <- tbl(src = options()$statskier_src,"main") %>%
       filter(raceid %in% ath1_data$raceid) %>%
       group_by(raceid) %>%
       summarise(winning_time = min(time)) %>%
       collect()
 
-    ath2_data <- tbl(src = src,"main") %>%
+    ath2_data <- tbl(src = options()$statskier_src,"main") %>%
       filter(name %in% ath2 &
                type == 'Distance' &
                raceid %in% ath1_data$raceid) %>%
@@ -187,7 +186,7 @@ hth_dst <- function(ath1,
     theme(legend.position = "bottom",
           legend.direction = "horizontal") +
     guides(fill = guide_legend(override.aes = list(alpha = 0.5)))
-
+    
   return(list(plot = p,
               data = ath_data,
               line_data = ath_summary,
@@ -207,13 +206,12 @@ hth_spr <- function(ath1,
                     races = c("maj_int","fis"),
                     measure = c("fispoints","rank"),
                     by_tech = FALSE){
-  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
-
+  
   races <- match.arg(races)
   measure <- match.arg(measure)
 
   if (races == "maj_int"){
-    ath1_data <- tbl(src = src,"main") %>%
+    ath1_data <- tbl(src = options()$statskier_src,"main") %>%
       filter(name == ath1 &
                cat1 %in% MAJ_INT &
                type == 'Sprint') %>%
@@ -221,7 +219,7 @@ hth_spr <- function(ath1,
       select(raceid,date,season,tech,
              fisid,name,rank,fispoints)
 
-    ath2_data <- tbl(src = src,"main") %>%
+    ath2_data <- tbl(src = options()$statskier_src,"main") %>%
       filter(name %in% ath2 &
                cat1 %in% MAJ_INT &
                type == 'Sprint') %>%
@@ -238,14 +236,14 @@ hth_spr <- function(ath1,
              fisid.y,name.y,drank,dfispoints)
   }
   if (races == "fis"){
-    ath1_data <- tbl(src = src,"main") %>%
+    ath1_data <- tbl(src = options()$statskier_src,"main") %>%
       filter(name == ath1 &
                type == 'Sprint') %>%
       collect() %>%
       select(raceid,date,season,tech,
              fisid,name,rank,fispoints)
 
-    ath2_data <- tbl(src = src,"main") %>%
+    ath2_data <- tbl(src = options()$statskier_src,"main") %>%
       filter(name %in% ath2 &
                type == 'Sprint') %>%
       collect() %>%

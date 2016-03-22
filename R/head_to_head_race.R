@@ -6,11 +6,10 @@ hth_race <- function(ath1_name,
                      min_encounters = 1,
                      measure = c('rank','fispoints','pb'),
                      restrict_by = NULL){
-  src <- src_sqlite(path = statskier2:::sqlite_path,create = FALSE)
-
+  
   measure <- match.arg(measure)
 
-  race_data <- tbl(src = src,"main") %>%
+  race_data <- tbl(src = options()$statskier_src,"main") %>%
     filter(raceid == race_id &
              rank <= num_ath2) %>%
     collect()
