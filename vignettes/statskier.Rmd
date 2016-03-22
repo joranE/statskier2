@@ -1,0 +1,50 @@
+---
+title: "statskier"
+author: "Joran Elias"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{statskier}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This package contains a collection of functions to be used with the Statistical Skier race results database.
+
+## Database Connection
+
+When the package is loaded via `library(statskier2)` the package attempts to connect to a database backend. First, it looks for a local SQLite database and if this is not found, it attempts to connect to a remote MySQL database.
+
+For either to work, you must modify `options()` in your `.Rprofile` file to include:
+
+```
+options(mysql = list(
+  "host" = "00.00.0.00",
+  "port" = 1234,
+  "user" = "username",
+  "password" = "password",
+  "dbName" = "name"
+))
+
+options(sqlite_path = "/path/to/sqlite/database")
+```
+Specifically, if `options("sqlite_path")` is unset, or the file does not exist, the package checks if `options("mysql")` is set and if it is it attempts to open the specified connection. If that fails a warning is issued.
+
+## Usage
+
+Most functions will automatically use the database connection created when the package is loaded. However, you can also manually create a connection and send arbitrary SQL:
+
+```{r}
+#Don't worry about the warning 
+library(statskier2)
+#These functions also assume the presence of connection info in options()
+#Create local SQlite connection
+conl <- db_xc_local()
+#Create remote MySQL connection
+conr <- db_xc_remote()
+
+ss_query(conl,"select * from main limit 5")
+ss_query(conr,"select * from main limit 5")
+```
+
+Everything is in one table, `main`, which seems less than ideal, but it just isn't that big and saves a ton of hassles with constantly joining things. There is one convenience view called `maj_int` that simply limits the results to World Cup, Olympic, World Championships and Tour de Ski results.
