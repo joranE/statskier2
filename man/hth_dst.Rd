@@ -2,28 +2,53 @@
 % Please edit documentation in R/head_to_head.R
 \name{hth_dst}
 \alias{hth_dst}
-\title{Head-to-head Distance Plot & Data}
+\alias{hth_spr}
+\title{Head-to-head Plots & Data}
 \usage{
 hth_dst(ath1, ath2, races = c("maj_int", "fis"), measure = c("fispoints",
   "rank", "time", "pb", "mpb"), by_tech = FALSE, by_start = FALSE)
+
+hth_spr(ath1, ath2, races = c("maj_int", "fis"), measure = c("fispoints",
+  "rank"), by_tech = FALSE, by_start = FALSE)
 }
 \arguments{
-\item{ath1}{character; athlete of interest}
+\item{ath1}{character; single athlete of interest}
 
 \item{ath2}{character vector of athletes to compare with}
 
 \item{races}{character; one of "maj_int" or "fis"}
 
 \item{measure}{character; one of "fispoints", "rank", "time", "pb" or "mpb".
-"mpb" only is sensible if \code{races = "maj_int"}.}
+"mpb" only is sensible for distance races and if \code{races = "maj_int"}.}
 
 \item{by_tech}{boolean; split trend lines by technique. Only one of
 \code{by_tech} and \code{by_start} can by \code{TRUE}.}
 
 \item{by_start}{boolean; split trend lines by race type. Only one of
-\code{by_tech} and \code{by_start} can by \code{TRUE}.}
+\code{by_tech} and \code{by_start} can by \code{TRUE}. Ignored for
+sprint race comparisons}
+}
+\value{
+A named list with components:
+\enumerate{
+ \item \code{plot} - ggplot2 plot object
+ \item \code{data} - raw head-to-head results data
+ \item \code{line_data} - summarised head-to-head data for plotted lines
+ \item \code{block} - data useful only for constructing the plot
+}
 }
 \description{
-Head-to-head Distance Plot & Data
+Sprint and distance head-to-head plots and accompanying
+data. Use these to compare one athlete (\code{ath1}) to a
+collection of other athletes (\code{ath2}).
+}
+\examples{
+\dontrun{
+p <- hth_dst(ath1 = 'DIGGINS Jessica',
+             ath2 = c('RANDALL Kikkan','BJORNSEN Sadie','SARGENT Ida'),
+             races = "fis",
+             measure = "pb")
+print(p$plot)
+}
 }
 

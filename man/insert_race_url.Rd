@@ -14,10 +14,6 @@ insert_race_url(raceid, url1 = NA, url2 = NA)
 \item{url2}{character}
 }
 \description{
-Insert Race URLs
-}
-\seealso{
-Other race.info.functions: \code{\link{open_race_url}},
-  \code{\link{update_race_url}}
+Only available to those with INSERT priviledges
 }
 

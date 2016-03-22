@@ -2,16 +2,23 @@
 % Please edit documentation in R/db_functions.R
 \name{ss_query}
 \alias{ss_query}
-\title{Query XC Database}
+\title{Query XC Results Database}
 \usage{
 ss_query(con, q)
 }
 \arguments{
-\item{con}{database connection}
+\item{con}{database connection as generated via \code{\link{db_xc_local}} or
+\code{\link{db_xc_remote}}}
 
 \item{q}{character; SQL}
 }
 \description{
-Query XC Database
+Query XC Results Database
+}
+\examples{
+\dontrun{
+conl <- db_xc_local()
+ss_query(conl,"select * from main where name = 'RANDALL Kikkan' limit 3")
+}
 }
 

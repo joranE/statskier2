@@ -14,10 +14,9 @@ update_race_url(raceid, url1 = NA, url2 = NA)
 \item{url2}{character}
 }
 \description{
-Update Race URLs
+Only available to those with UPDATE priviledges
 }
 \seealso{
-Other race.info.functions: \code{\link{insert_race_url}},
-  \code{\link{open_race_url}}
+Other race.info.functions: \code{\link{open_race_url}}
 }
 

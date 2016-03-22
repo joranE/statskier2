@@ -2,7 +2,7 @@
 % Please edit documentation in R/wjc_u23_hist.R
 \name{wjc_u23_plot}
 \alias{wjc_u23_plot}
-\title{WJC & U23 History Plots & Data}
+\title{WJC & U23 History Plots}
 \usage{
 wjc_u23_plot(nations, races = c("WJC", "U23"))
 }
@@ -11,7 +11,22 @@ wjc_u23_plot(nations, races = c("WJC", "U23"))
 
 \item{races}{character; one of "WJC" or "U23"}
 }
+\value{
+A named list with components:
+\enumerate{
+ \item \code{plots} - a named list of plots, one for each nation
+ \item \code{data} - raw data used for plots
+}
+}
 \description{
-WJC & U23 History Plots & Data
+Results trends for nations at either World Juniors or
+U23s, by gender and race type.
+}
+\examples{
+\dontrun{
+p <- wjc_u23_plot(nations = c('USA','CAN'),races = 'WJC')
+print(p$plots$USA)
+print(p$plots$CAN)
+}
 }
 

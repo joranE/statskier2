@@ -2,11 +2,28 @@
 % Please edit documentation in R/db_functions.R
 \name{db_xc_local}
 \alias{db_xc_local}
-\title{Create Local XC DB Connection}
+\alias{db_xc_remote}
+\title{Manually Create Database Connections}
 \usage{
 db_xc_local()
+
+db_xc_remote()
+}
+\value{
+A database connection object
 }
 \description{
-Create Local XC DB Connection
+Use these functions to manually create connections to
+either a local SQLite database or a remote MySQL database.
+}
+\details{
+These connections should then be passed to \code{\link{ss_query}}
+when performing arbitrary SQL queries on the data.
+}
+\examples{
+\dontrun{
+conl <- db_xc_local()
+ss_query(conl,"select * from main where name = 'RANDALL Kikkan' limit 3")
+}
 }
 

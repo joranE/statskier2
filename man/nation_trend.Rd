@@ -2,19 +2,39 @@
 % Please edit documentation in R/nation_trend.R
 \name{nation_trend}
 \alias{nation_trend}
-\title{National Level Performance Trends}
+\title{Performance Trends By Nation}
 \usage{
 nation_trend(nations, race_gender = c("Men", "Women"),
   race_type = c("Distance", "Sprint"))
 }
 \arguments{
-\item{nations}{character vector of nations}
+\item{nations}{character vector of nation codes}
 
 \item{race_gender}{character; one of "Men" or "Women"}
 
 \item{race_type}{character; one of "Distance" or "Sprint"}
 }
+\value{
+A named list with components:
+\enumerate{
+ \item \code{plot} - ggplot2 plot object
+ \item \code{nation_data} - raw data for each nation
+ \item \code{nation_summary} - summarised data by nation
+ \item \code{race_data} - race counts used for plotting
+}
+}
 \description{
-Only look at major international results.
+Only considers results from major international races and
+summarises them by the number of race results at a particular
+level (wins, podiums, etc.) per race.
+}
+\examples{
+\dontrun{
+library(ggplot2)
+p <- nation_trend(nations = c('USA','CAN','RUS','SWE'),
+                  race_gender = 'Men',
+                  race_type = 'Distance')
+print(p$plot)
+}
 }
 

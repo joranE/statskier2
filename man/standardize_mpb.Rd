@@ -2,15 +2,31 @@
 % Please edit documentation in R/median_perc_back.R
 \name{standardize_mpb}
 \alias{standardize_mpb}
-\title{Standardize Median Percent Back}
+\title{Standardized Median Percent Back}
 \usage{
 standardize_mpb(race_data)
 }
 \arguments{
-\item{race_data}{data frame}
+\item{race_data}{data frame containing the columns \code{gender},
+\code{start}, \code{season} and \code{mpb}}
+}
+\value{
+The original data frame with the \code{mpb} column replaced
+by standardized values, to be on a common scale.
 }
 \description{
 Standardize median percent back by
 season, gender and race type
+}
+\examples{
+\dontrun{
+library(dplyr)
+conr <- db_xc_remote()
+dat <- ss_query(conr,"select * from main where raceid = 7902")
+dat \%>\% mpb() \%>\% standardize_mpb()
+}
+}
+\seealso{
+\code{\link{mpb}}
 }
 

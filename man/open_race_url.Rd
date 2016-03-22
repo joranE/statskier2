@@ -2,7 +2,7 @@
 % Please edit documentation in R/race_urls.R
 \name{open_race_url}
 \alias{open_race_url}
-\title{Show race in browser}
+\title{Open Race URL in Browser}
 \usage{
 open_race_url(raceid)
 }
@@ -12,8 +12,12 @@ open_race_url(raceid)
 \description{
 Open results for a race in a web browser.
 }
+\examples{
+\dontrun{
+open_race_url(raceid = 7902)
+}
+}
 \seealso{
-Other race.info.functions: \code{\link{insert_race_url}},
-  \code{\link{update_race_url}}
+Other race.info.functions: \code{\link{update_race_url}}
 }
 

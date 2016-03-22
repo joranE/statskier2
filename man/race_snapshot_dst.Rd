@@ -2,19 +2,39 @@
 % Please edit documentation in R/race_snapshot.R
 \name{race_snapshot_dst}
 \alias{race_snapshot_dst}
-\title{Distance Race Snapshot}
+\alias{race_snapshot_spr}
+\title{Race Snapshots}
 \usage{
 race_snapshot_dst(race_id, cutoff = 365 * 4, reduced = TRUE)
+
+race_snapshot_spr(race_id, cutoff = 365 * 4, reduced = TRUE)
 }
 \arguments{
 \item{race_id}{integer race id}
 
 \item{cutoff}{integer number of days in past to gether data from}
 
-\item{reduced}{boolean; only examine top 30 plus North Americans}
+\item{reduced}{boolean; if \code{TRUE} only show top 30 plus North Americans}
+}
+\value{
+A named list with components:
+\enumerate{
+ \item \code{plot} - ggplot2 plot object
+ \item \code{cur_race} - raw results for race in question
+ \item \code{ath_min} - data for athletes with too few races to plot range bars
+ \item \code{ath_bars} - data for athlete range bars
+ \item \code{block} - data frame for color blocks in plot
+}
 }
 \description{
-Race snapshot graphs for major international
-distance races.
+Distance and sprint race snapshot graphs for major international
+distance events.
+}
+\examples{
+\dontrun{
+library(ggplot2)
+p <- race_snapshot_dst(raceid = 7902)
+print(p$plot)
+}
 }
 

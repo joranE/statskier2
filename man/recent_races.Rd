@@ -2,14 +2,25 @@
 % Please edit documentation in R/recent_races.R
 \name{recent_races}
 \alias{recent_races}
-\title{List most recent XC races in db}
+\title{Recent Races}
 \usage{
 recent_races(cur_date)
 }
 \arguments{
-\item{cur_date}{character; a date}
+\item{cur_date}{character; a date in the format "YYYY-MM-DD"}
+}
+\value{
+A data frame with one row for each race listing various details
 }
 \description{
-List most recent XC races in db
+Utility function for listing the most recent
+races in the database since a given date. Used mainly
+to help track what new races need to be entered.
+}
+\examples{
+\dontrun{
+x <- recent_races("2016-02-01")
+head(x)
+}
 }
 

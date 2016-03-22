@@ -3,8 +3,14 @@ Type: Package
 Title: Statistical Skier Tools
 Version: 0.1
 Imports:
+    DBI,
+    RSQLite,
+    RMySQL,
     dplyr,
-    stringr
+    stringr,
+    ggplot2,
+    tidyr,
+    RColorBrewer
 Date: 2015-12-08
 Author: Joran Elias
 Maintainer: Joran Elias <statisticalskier@gmail.com>
@@ -12,3 +18,6 @@ Description: Complete rewrite of functions and tools for Statistcal Skier
 License: GPL
 LazyData: TRUE
 RoxygenNote: 5.0.1
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
