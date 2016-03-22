@@ -1,13 +1,23 @@
-#' Create Local XC DB Connection
+#' Manually Create Database Connections
 #'
+#' Use these functions to manually create connections to
+#' either a local SQLite database or a remote MySQL database.
+#'
+#' These connections should then be passed to \code{\link{ss_query}}
+#' when performing arbitrary SQL queries on the data.
+#' @return A database connection object
 #' @export
 #' @import RSQLite
+#' @examples
+#' \dontrun{
+#' conl <- db_xc_local()
+#' ss_query(conl,"select * from main where name = 'RANDALL Kikkan' limit 3")
+#' }
 db_xc_local <- function(){
   dbConnect(SQLite(), options()$sqlite_path)
 }
 
-#' Create Remote XC DB Connection
-#'
+#' @rdname db_xc_local
 #' @export
 #' @import RMySQL
 db_xc_remote <- function(){
@@ -19,13 +29,19 @@ db_xc_remote <- function(){
             port = options()$mysql$port)
 }
 
-#' Query XC Database
+#' Query XC Results Database
 #'
-#' @param con database connection
+#' @param con database connection as generated via \code{\link{db_xc_local}} or
+#' \code{\link{db_xc_remote}}
 #' @param q character; SQL
 #'
 #' @import DBI
 #' @export
+#' @examples
+#' \dontrun{
+#' conl <- db_xc_local()
+#' ss_query(conl,"select * from main where name = 'RANDALL Kikkan' limit 3")
+#' }
 ss_query <- function(con,q){
   dbGetQuery(con,q)
 }

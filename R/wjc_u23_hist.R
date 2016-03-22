@@ -1,10 +1,24 @@
-#' WJC & U23 History Plots & Data
+#' WJC & U23 History Plots
+#'
+#' Results trends for nations at either World Juniors or
+#' U23s, by gender and race type.
 #'
 #' @param nations character vector of nations
 #' @param races character; one of "WJC" or "U23"
+#' @return A named list with components:
+#' \enumerate{
+#'  \item \code{plots} - a named list of plots, one for each nation
+#'  \item \code{data} - raw data used for plots
+#' }
 #' @export
+#' @examples
+#' \dontrun{
+#' p <- wjc_u23_plot(nations = c('USA','CAN'),races = 'WJC')
+#' print(p$plots$USA)
+#' print(p$plots$CAN)
+#' }
 wjc_u23_plot <- function(nations,races = c('WJC','U23')){
-  
+
   races <- match.arg(races)
   wjc <- tbl(src = options()$statskier_src,"main") %>%
     filter(cat1 == races &

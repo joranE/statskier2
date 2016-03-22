@@ -1,7 +1,26 @@
+#' Sprint Results Plot
+#'
+#' Bar plot by season summarising major international sprint
+#' race performance by counting how often an athlete reached the
+#' quaterfinals, semifinals, etc.
+#'
+#' @param ath_names character vector of athlete names
+#' @param by_tech boolean; if \code{TRUE} split graph by technique
+#' @return A named list with components:
+#' \enumerate{
+#'  \item \code{plot} - a ggplot2 plot object
+#'  \item \code{ath_data} - raw athlete data
+#' }
 #' @importFrom RColorBrewer brewer.pal
 #' @export
+#' @examples
+#' \dontrun{
+#' library(ggplot2)
+#' p <- spr_plot(ath_names = c('NEWELL Andrew','HAMILTON Simeon'))
+#' print(p$plot)
+#' }
 spr_plot <- function(ath_names,by_tech = FALSE){
-  
+
   if (length(ath_names) == 1){
     ath_names <- c(ath_names,ath_names)
   }

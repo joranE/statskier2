@@ -1,17 +1,23 @@
-#' Show race in browser
+#' Open Race URL in Browser
 #'
 #' Open results for a race in a web browser.
 #'
 #' @param raceid integer
 #' @export
 #' @family race info functions
+#' @examples
+#' \dontrun{
+#' open_race_url(raceid = 7902)
+#' }
 open_race_url <- function(raceid){
   if (length(raceid) > 1){
     raceid <- raceid[1]
     warning("Ignoring all but first raceid...",immediate. = TRUE)
   }
-  con_local <- db_xc_local()
-  urls <- ss_query(con_local,sprintf("select * from race_url where raceid = %s",raceid))
+  rid <- raceid
+  urls <- tbl(options()$statskier_src,"race_url") %>%
+    filter(raceid == rid) %>%
+    collect()
   if (nrow(urls) == 0){
     stop("No URLs for that raceid yet.")
   }
@@ -29,10 +35,11 @@ open_race_url <- function(raceid){
 
 #' Update Race URLs
 #'
+#' Only available to those with UPDATE priviledges
+#'
 #' @param raceid integer race id
 #' @param url1 character
 #' @param url2 character
-#' @export
 #' @family race info functions
 update_race_url <- function(raceid,url1 = NA,url2 = NA){
   con_local <- db_xc_local()
@@ -55,11 +62,11 @@ update_race_url <- function(raceid,url1 = NA,url2 = NA){
 
 #' Insert Race URLs
 #'
+#' Only available to those with INSERT priviledges
+#'
 #' @param raceid integer race id
 #' @param url1 character
 #' @param url2 character
-#' @export
-#' @family race info functions
 insert_race_url <- function(raceid,url1 = NA,url2 = NA){
   con_local <- db_xc_local()
   con_remote <- db_xc_remote()
@@ -83,9 +90,11 @@ insert_race_url <- function(raceid,url1 = NA,url2 = NA){
   dbDisconnect(con_remote)
 }
 
-#' @export
+#' Races With Missing URLs
+#'
+#' Look for races with missing URLs
 missing_race_url <- function(){
-  
+
   missing_url <- left_join(tbl(src = options()$statskier_src,
                                from = sql("select distinct raceid,season,date,gender,
                                           location,type,cat1,cat2,length,tech,start
@@ -98,7 +107,9 @@ missing_race_url <- function(){
   missing_url
 }
 
-#' @export
+#' Fill Missing URLs
+#'
+#' Utility function to fill missing race URLs.
 fill_missing_url <- function(){
   todo <- missing_race_url() %>%
     arrange(season,date)

@@ -1,16 +1,33 @@
-#' National Level Performance Trends
+#' Performance Trends By Nation
 #'
-#' Only look at major international results.
+#' Only considers results from major international races and
+#' summarises them by the number of race results at a particular
+#' level (wins, podiums, etc.) per race.
 #'
-#' @param nations character vector of nations
+#' @param nations character vector of nation codes
 #' @param race_gender character; one of "Men" or "Women"
 #' @param race_type character; one of "Distance" or "Sprint"
+#' @return A named list with components:
+#' \enumerate{
+#'  \item \code{plot} - ggplot2 plot object
+#'  \item \code{nation_data} - raw data for each nation
+#'  \item \code{nation_summary} - summarised data by nation
+#'  \item \code{race_data} - race counts used for plotting
+#' }
 #' @importFrom tidyr gather
 #' @export
+#' @examples
+#' \dontrun{
+#' library(ggplot2)
+#' p <- nation_trend(nations = c('USA','CAN','RUS','SWE'),
+#'                   race_gender = 'Men',
+#'                   race_type = 'Distance')
+#' print(p$plot)
+#' }
 nation_trend <- function(nations,
                          race_gender = c('Men','Women'),
                          race_type = c('Distance','Sprint')){
-  
+
   if (length(nations) == 1){
     nations <- c(nations,nations)
   }

@@ -1,14 +1,30 @@
-#' Distance Race Snapshot
+#' Race Snapshots
 #'
-#' Race snapshot graphs for major international
-#' distance races.
+#' Distance and sprint race snapshot graphs for major international
+#' distance events.
 #'
 #' @param race_id integer race id
 #' @param cutoff integer number of days in past to gether data from
-#' @param reduced boolean; only examine top 30 plus North Americans
+#' @param reduced boolean; if \code{TRUE} only show top 30 plus North Americans
+#' @return A named list with components:
+#' \enumerate{
+#'  \item \code{plot} - ggplot2 plot object
+#'  \item \code{cur_race} - raw results for race in question
+#'  \item \code{ath_min} - data for athletes with too few races to plot range bars
+#'  \item \code{ath_bars} - data for athlete range bars
+#'  \item \code{block} - data frame for color blocks in plot
+#' }
 #' @import ggplot2
 #' @export
-race_snapshot_dst <- function(race_id,cutoff = 365 * 4,reduced = TRUE){
+#' @examples
+#' \dontrun{
+#' library(ggplot2)
+#' p <- race_snapshot_dst(raceid = 7902)
+#' print(p$plot)
+#' }
+race_snapshot_dst <- function(race_id,
+                              cutoff = 365 * 4,
+                              reduced = TRUE){
 
   cur_race <- tbl(src = options()$statskier_src,"main") %>%
     filter(raceid == race_id) %>%
@@ -155,18 +171,12 @@ race_snapshot_dst <- function(race_id,cutoff = 365 * 4,reduced = TRUE){
               block = block))
 }
 
-#' Sprint Race Snapshot
-#'
-#' Race snapshot graphs for major international
-#' sprint races.
-#'
-#' @param race_id integer race id
-#' @param cutoff integer number of days in past to gether data from
-#' @param reduced boolean; only examine top 30 plus North Americans
-#' @import ggplot2
+#' @rdname race_snapshot_dst
 #' @export
-race_snapshot_spr <- function(race_id,cutoff = 365 * 4,reduced = TRUE){
-  
+race_snapshot_spr <- function(race_id,
+                              cutoff = 365 * 4,
+                              reduced = TRUE){
+
   cur_race <- tbl(src = options()$statskier_src,"main") %>%
     filter(raceid == race_id) %>%
     arrange(rank) %>%
