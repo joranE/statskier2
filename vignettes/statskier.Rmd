@@ -34,7 +34,7 @@ Specifically, if `options("sqlite_path")` is unset, or the file does not exist, 
 
 Most functions will automatically use the database connection created when the package is loaded. However, you can also manually create a connection and send arbitrary SQL:
 
-```{r}
+```
 #Don't worry about the warning 
 library(statskier2)
 #These functions also assume the presence of connection info in options()
