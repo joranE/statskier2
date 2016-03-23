@@ -22,3 +22,25 @@ recent_races <- function(cur_date){
     as.data.frame()
   res
 }
+
+#' Find Races
+#'
+#' Search for races on a specific date
+#'
+#' @param date character; e.g. 'YYYY-MM-DD'
+#' @return A data frame with information on every race for the given date
+#' @export
+#' @examples
+#' \dontrun{
+#' find_races(cur_date = '2015-01-01')
+#' }
+find_races <- function(cur_date){
+  res <- tbl(src = options()$statskier_src,"main") %>%
+    filter(date == cur_date) %>%
+    select(raceid,date,location,cat1,cat2,gender,type,tech,length,start) %>%
+    arrange(date,location,cat1,cat2,type,tech,gender) %>%
+    collect() %>%
+    unique() %>%
+    as.data.frame()
+  res
+}
