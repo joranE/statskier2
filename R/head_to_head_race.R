@@ -1,11 +1,27 @@
+#' Head-to-Head Against Skiers in a Specific Race
+#'
+#' Compare results of \code{ath1_name} in a specific race (\code{race_id})
+#' to the historical record of how \code{ath1_name} has performed against the
+#' particular opponents in that race. Serves as a slightly more "objective" way
+#' to judge whether \code{ath1_name} had a good, bad or average race.
+#'
+#' @param ath1_name character
+#' @param race_id integer
+#' @param num_opp integer; limit comparison to opponents in the top \code{num_opp}.
+#' Defaults to \code{Inf} meaning look at all opponents.
+#' @param cutoff integer; length of time in days to look at historical results
+#' @param min_encounters integer; minimum number of time \code{ath1_name} must have
+#' faced an opponent for the opponent to be included in the comparison
+#' @param measure character; one of \code{"rank"}, \code{"fispoints"} or \code{"pb"}
+#' @param restrict_by currently unused
 #' @export
 #' @examples
 #' \dontrun{
-#' x <- hth_race('DIGGINS Jessica',9232,num_ath2 = 30,min_encounters = 3,measure = 'pb')
+#' x <- hth_race('DIGGINS Jessica',9232,num_opp = 30,min_encounters = 3,measure = 'pb')
 #' }
 hth_race <- function(ath1_name,
                      race_id,
-                     num_ath2 = Inf,
+                     num_opp = Inf,
                      cutoff = 365 * 5,
                      min_encounters = 1,
                      measure = c('rank','fispoints','pb'),
@@ -16,7 +32,7 @@ hth_race <- function(ath1_name,
   race_data <- tbl(src = options()$statskier_src,"main") %>%
     filter(raceid == race_id) %>%
     collect() %>%
-    filter(rank <= num_ath2)
+    filter(rank <= num_opp)
 
   ath2_names <- select(race_data,fisid,name) %>%
     filter(name != ath1_name)
@@ -48,9 +64,6 @@ hth_race <- function(ath1_name,
                  'rank' = 'Finishing Place',
                  'fispoints' = 'FIS Points',
                  'pb' = 'Percent Back')
-  hth_data$victor <- ifelse(hth_data$y >= 0,
-                            paste(extract_all_caps(ath1_name),"Wins"),
-                            'Opponent Wins')
 
   #Extract computed data frame from violin plot
   tmp_plot <- ggplot() +
@@ -81,9 +94,10 @@ hth_race <- function(ath1_name,
 
 
   p <- ggplot() +
-        geom_polygon(data = polygon_data,
-                     aes(x = x,y = y,group = group1,fill = fill_group),
-                     alpha = 0.25) +
+    geom_polygon(data = polygon_data,
+                 aes(x = x,y = y,
+                     group = group1,fill = fill_group),
+                 alpha = 0.25) +
     geom_violin(data = cur_race,
                 aes(x = season,y = y),
                 fill = "grey20",
@@ -91,7 +105,10 @@ hth_race <- function(ath1_name,
     scale_x_continuous(breaks = as.integer(x_labs),
                        labels = levels(x_labs)) +
     labs(x = NULL,y = ylab,fill = "") +
-    theme(legend.position = "bottom",
+    theme(axis.text.x = element_text(angle = 310,
+                                     hjust = 0,
+                                     vjust = 1),
+          legend.position = "bottom",
           legend.direction = "horizontal")
 
 
