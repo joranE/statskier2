@@ -14,7 +14,7 @@
 #' ss_query(conl,"select * from main where name = 'RANDALL Kikkan' limit 3")
 #' }
 db_xc_local <- function(){
-  dbConnect(SQLite(), options()$sqlite_path)
+  dbConnect(RSQLite::SQLite(), options()$sqlite_path)
 }
 
 #' @rdname db_xc_local
