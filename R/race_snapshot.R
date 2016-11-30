@@ -154,10 +154,9 @@ race_snapshot_dst <- function(race_id,
     facet_wrap(~facet_grp,nrow = 1,scale = "free_x") +
     geom_blank(data = cur_race,aes(x = mpb,y = name1)) +
     geom_rect(data = block,
-              aes(NULL,NULL,
-                  ymin = ymn,ymax = ymx,
+              aes(ymin = ymn,ymax = ymx,
                   xmin = -Inf,xmax = Inf,
-                  fill = block),alpha = 0.1,show_guide = FALSE) +
+                  fill = block),alpha = 0.1,show.legend = FALSE) +
     geom_segment(data = ath_bars,aes(x = q25,xend = q75,y = name1,yend = name1)) +
     geom_point(data = cur_race,aes(x = mpb,y = name1),color = "red") +
     geom_point(data = ath_min,aes(x = mpb,y = name1),alpha = 0.5) +
@@ -277,10 +276,9 @@ race_snapshot_spr <- function(race_id,
     facet_wrap(~facet_grp,nrow = 1,scale = "free_x") +
     geom_blank(data = cur_race,aes(x = rank,y = name1)) +
     geom_rect(data = block,
-              aes(NULL,NULL,
-                  ymin = ymn,ymax = ymx,
+              aes(ymin = ymn,ymax = ymx,
                   xmin = -Inf,xmax = Inf,
-                  fill = block),alpha = 0.1,show_guide = FALSE) +
+                  fill = block),alpha = 0.1,show.legend = FALSE) +
     geom_segment(data = ath_bars,aes(x = q25,xend = q75,y = name1,yend = name1)) +
     geom_point(data = cur_race,aes(x = rank,y = name1),color = "red") +
     geom_point(data = ath_min,aes(x = rank,y = name1),alpha = 0.5) +
