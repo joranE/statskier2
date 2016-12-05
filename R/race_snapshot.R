@@ -161,7 +161,8 @@ race_snapshot_dst <- function(race_id,
     geom_point(data = cur_race,aes(x = mpb,y = name1),color = "red") +
     geom_point(data = ath_min,aes(x = mpb,y = name1),alpha = 0.5) +
     scale_fill_manual(values = c('red','blue')) +
-    labs(x = 'Standardized % Behind Median Skier',y = 'Athlete',fill = "")
+    labs(x = 'Standardized % Behind Median Skier',y = 'Athlete',
+         fill = "",caption = "statisticalskier.com - @statskier")
 
   return(list(plot = p,
               cur_race = cur_race,
@@ -283,7 +284,8 @@ race_snapshot_spr <- function(race_id,
     geom_point(data = cur_race,aes(x = rank,y = name1),color = "red") +
     geom_point(data = ath_min,aes(x = rank,y = name1),alpha = 0.5) +
     scale_fill_manual(values = c('red','blue')) +
-    labs(x = 'Finishing Place',y = 'Athlete',fill = "")
+    labs(x = 'Finishing Place',y = 'Athlete',
+         fill = "",caption = "statisticalskier.com - @statskier")
 
   return(list(plot = p,
               cur_race = cur_race,
