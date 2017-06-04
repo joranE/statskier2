@@ -128,6 +128,7 @@ ath_plot_dst <- function(ath_names,
 }
 
 #' @rdname ath_plot_dst
+#' @export
 ath_plot_spr <- function(ath_names,
                          races = c("maj_int","fis"),
                          by_tech = FALSE,
