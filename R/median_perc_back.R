@@ -58,7 +58,7 @@ mpb <- function(race_data){
 #' }
 standardize_mpb <- function(race_data){
   if (!all(c('mpb','gender','start','season') %in% colnames(race_data))){
-    stop("\nRequires mpb,gender,season#tart columns.")
+    stop("\nRequires mpb,gender,season,start columns.")
   }
 
   conv_fac <- tbl(src = options()$statskier_src,from = "xc_fac") %>%
