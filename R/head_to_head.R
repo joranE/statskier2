@@ -192,12 +192,12 @@ hth_dst <- function(ath1,
   p <- ggplot() +
     facet_wrap(~facet_name) +
     geom_rect(data = block,
-              aes(NULL,NULL,
-                  xmin = xmn,xmax = xmx,
+              aes(xmin = xmn,xmax = xmx,
                   ymin = ymn,ymax = ymx,
                   fill = factor(fill_name)),
               alpha = 0.1) +
     geom_point(data = ath_data,aes(x = as.Date(date),y = y)) +
+    #geom_segment(data = ath_data,aes(x = as.Date(date),xend = as.Date(date),yend = y),y = 0) +
     line_piece +
     labs(x = NULL,
          y = y_label,
