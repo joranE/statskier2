@@ -19,57 +19,56 @@
 #' \dontrun{
 #' x <- hth_race('DIGGINS Jessica',9232,num_opp = 30,min_encounters = 3,measure = 'pb')
 #' }
-hth_race <- function(ath1_name,
+hth_race <- function(ath_names,
                      race_id,
                      num_opp = Inf,
                      cutoff = 365 * 5,
                      min_encounters = 1,
                      measure = c('rank','fispoints','pb'),
+                     events = c('all','maj_int'),
                      restrict_by = NULL){
 
   measure <- match.arg(measure)
+  events = match.arg(events)
 
   race_data <- tbl(src = options()$statskier_src,"main") %>%
     filter(raceid == race_id) %>%
     collect() %>%
-    filter(rank <= num_opp)
+    filter(rank <= num_opp | name %in% ath_names)
 
-  ath2_names <- select(race_data,fisid,name) %>%
-    filter(name != ath1_name)
+  opp_names <- race_data %>%
+    filter(!name %in% ath_names) %>%
+    pull(var = "name")
 
   race_info <- race_data %>%
-    select(raceid,type,tech,start,length) %>%
-    unique()
+    select(raceid,date,type,tech,start,length) %>%
+    distinct()
 
-  if (race_info$type == 'Distance'){
-    hth_data <- hth_dst(ath1 = ath1_name,
-                        ath2 = ath2_names$name,
-                        races = "fis",
-                        measure = measure)$data %>%
-      group_by(facet_name) %>%
-      mutate(n_races = n_distinct(raceid)) %>%
-      ungroup() %>%
-      filter(n_races >= min_encounters) %>%
-      as.data.frame()
-  }
-  if(race_info$type == 'Sprint'){
-    hth_data <- hth_spr(ath1 = ath1_name,
-                        ath2 = ath2_names,
-                        races = "fis",
-                        measure = measure)$data
+  race_day <- as.integer(as.Date(race_info$date))
+
+  hth_df <- hth_data(athletes = ath_names,
+                     opponents = opp_names) %>%
+    filter(n_races >= min_encounters &
+             race_day - as.integer(as.Date(date)) <= cutoff)
+
+  if (events == 'maj_int'){
+    hth_df <- filter(hth_df,cat1 %in% c('WC','TDS','OWG','WSC'))
   }
 
-  hth_data$y <- hth_data[[paste0("d",measure)]]
+  hth_df$y <- hth_df[[paste0("diff_",measure)]]
   ylab <- switch(measure,
                  'rank' = 'Finishing Place',
                  'fispoints' = 'FIS Points',
                  'pb' = 'Percent Back')
 
   #Extract computed data frame from violin plot
-  tmp_plot <- ggplot() +
-    geom_violin(data = hth_data[hth_data$raceid != race_id,],
-                aes(x = factor(season),y = y))
-  tmp_plot_data <- ggplot2::ggplot_build(tmp_plot)$data[[1]]
+  tmp_plot <- hth_df %>%
+    filter(raceid != race_id) %>%
+    ggplot(data = .,aes(x = factor(season),y = y)) +
+      facet_wrap(~ath_name) +
+      geom_violin()
+  tmp_plot_data <- ggplot2::ggplot_build(tmp_plot)$data[[1]] %>%
+    mutate(facet_var = ath_names[PANEL])
 
   #Adjust to make suitable for geom_polygon
   tmp_plot_data <- tmp_plot_data %>%
@@ -83,17 +82,18 @@ hth_race <- function(ath1_name,
     arrange(-y)
   polygon_data <- bind_rows(copy1,copy2) %>%
     mutate(group1 = interaction(factor(group),factor(y >= 0)),
-           fill_group = ifelse(y >= 0,paste(extract_all_caps(ath1_name),'Wins'),'Opponent Wins'))
+           fill_group = if_else(y >= 0,'Athlete Wins','Opponent Wins'))
 
-  cur_race <- hth_data %>%
-    mutate(season = factor(season)) %>%
-    filter(raceid == race_id) %>%
-    mutate(season = as.integer(season))
+  cur_race <- hth_df %>%
+    mutate(season = as.integer(factor(season)),
+           facet_var = ath_name) %>%
+    filter(raceid == race_id)
 
-  x_labs <- factor(unique(hth_data$season))
+  x_labs <- factor(unique(hth_df$season))
 
 
   p <- ggplot() +
+    facet_wrap(~facet_var) +
     geom_polygon(data = polygon_data,
                  aes(x = x,y = y,
                      group = group1,fill = fill_group),
@@ -114,5 +114,5 @@ hth_race <- function(ath1_name,
 
   return(list(plot = p,
               race_data = race_data,
-              hth_data = hth_data))
+              hth_df = hth_df))
 }
