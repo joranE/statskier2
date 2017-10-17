@@ -9,4 +9,3 @@ missing_race_url()
 \description{
 Look for races with missing URLs
 }
-

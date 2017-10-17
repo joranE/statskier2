@@ -37,4 +37,3 @@ p <- race_snapshot_dst(raceid = 7902)
 print(p$plot)
 }
 }
-

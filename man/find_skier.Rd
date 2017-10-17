@@ -27,4 +27,3 @@ find_skier("OSGOOD")
 find_skier("Bente")
 }
 }
-

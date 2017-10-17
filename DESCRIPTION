@@ -10,14 +10,17 @@ Imports:
     stringr,
     ggplot2,
     tidyr,
-    RColorBrewer
+    RColorBrewer,
+    squr,
+    matrixStats
 Date: 2015-12-08
 Author: Joran Elias
 Maintainer: Joran Elias <statisticalskier@gmail.com>
 Description: Complete rewrite of functions and tools for Statistcal Skier
 License: GPL
 LazyData: TRUE
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr
+ByteCompile: true

@@ -16,4 +16,3 @@ insert_race_url(raceid, url1 = NA, url2 = NA)
 \description{
 Only available to those with INSERT priviledges
 }
-

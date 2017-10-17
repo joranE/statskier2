@@ -12,4 +12,3 @@ extract_all_caps(x)
 \description{
 Extract All Cap Words
 }
-

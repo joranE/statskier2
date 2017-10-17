@@ -17,6 +17,5 @@ update_race_url(raceid, url1 = NA, url2 = NA)
 Only available to those with UPDATE priviledges
 }
 \seealso{
-Other race.info.functions: \code{\link{open_race_url}}
+Other race info functions: \code{\link{open_race_url}}
 }
-

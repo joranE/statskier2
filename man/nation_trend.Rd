@@ -37,4 +37,3 @@ p <- nation_trend(nations = c('USA','CAN','RUS','SWE'),
 print(p$plot)
 }
 }
-

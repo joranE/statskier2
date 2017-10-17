@@ -9,4 +9,3 @@ fill_missing_url()
 \description{
 Utility function to fill missing race URLs.
 }
-

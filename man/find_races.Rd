@@ -20,4 +20,3 @@ Search for races on a specific date
 find_races(cur_date = '2015-01-01')
 }
 }
-

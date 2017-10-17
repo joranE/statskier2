@@ -12,4 +12,3 @@ xc_query(sql_query)
 \description{
 General query function
 }
-

@@ -36,4 +36,3 @@ to judge whether \code{ath1_name} had a good, bad or average race.
 x <- hth_race('DIGGINS Jessica',9232,num_opp = 30,min_encounters = 3,measure = 'pb')
 }
 }
-

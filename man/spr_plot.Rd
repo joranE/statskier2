@@ -30,4 +30,3 @@ p <- spr_plot(ath_names = c('NEWELL Andrew','HAMILTON Simeon'))
 print(p$plot)
 }
 }
-

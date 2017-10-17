@@ -27,4 +27,3 @@ dat \%>\% mpb()
 \seealso{
 \code{\link{standardize_mpb}}
 }
-

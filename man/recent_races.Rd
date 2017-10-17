@@ -23,4 +23,3 @@ x <- recent_races("2016-02-01")
 head(x)
 }
 }
-

@@ -29,4 +29,3 @@ dat \%>\% mpb() \%>\% standardize_mpb()
 \seealso{
 \code{\link{mpb}}
 }
-
