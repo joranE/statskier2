@@ -4,13 +4,11 @@
 \alias{hth_race}
 \title{Head-to-Head Against Skiers in a Specific Race}
 \usage{
-hth_race(ath1_name, race_id, num_opp = Inf, cutoff = 365 * 5,
+hth_race(ath_names, race_id, num_opp = Inf, cutoff = 365 * 5,
   min_encounters = 1, measure = c("rank", "fispoints", "pb"),
-  restrict_by = NULL)
+  events = c("all", "maj_int"), restrict_by = NULL)
 }
 \arguments{
-\item{ath1_name}{character}
-
 \item{race_id}{integer}
 
 \item{num_opp}{integer; limit comparison to opponents in the top \code{num_opp}.
@@ -24,6 +22,8 @@ faced an opponent for the opponent to be included in the comparison}
 \item{measure}{character; one of \code{"rank"}, \code{"fispoints"} or \code{"pb"}}
 
 \item{restrict_by}{currently unused}
+
+\item{ath1_name}{character}
 }
 \description{
 Compare results of \code{ath1_name} in a specific race (\code{race_id})

@@ -6,7 +6,7 @@
 \title{Head-to-head Plots & Data}
 \usage{
 hth_dst(ath1, ath2, races = c("maj_int", "fis"), measure = c("fispoints",
-  "rank", "time", "pb", "mpb"), by_tech = FALSE, by_start = FALSE)
+  "rank", "pb"), by_tech = FALSE, by_start = FALSE)
 
 hth_spr(ath1, ath2, races = c("maj_int", "fis"), measure = c("fispoints",
   "rank"), by_tech = FALSE, by_start = FALSE)
@@ -18,8 +18,7 @@ hth_spr(ath1, ath2, races = c("maj_int", "fis"), measure = c("fispoints",
 
 \item{races}{character; one of "maj_int" or "fis"}
 
-\item{measure}{character; one of "fispoints", "rank", "time", "pb" or "mpb".
-"mpb" only is sensible for distance races and if \code{races = "maj_int"}.}
+\item{measure}{character; one of "fispoints", "rank", "pb".}
 
 \item{by_tech}{boolean; split trend lines by technique. Only one of
 \code{by_tech} and \code{by_start} can by \code{TRUE}.}
@@ -39,7 +38,7 @@ A named list with components:
 }
 \description{
 Sprint and distance head-to-head plots and accompanying
-data. Use these to compare one athlete (\code{ath1}) to a
+data. Use these to compare some athletes (\code{ath1}) to a
 collection of other athletes (\code{ath2}).
 }
 \examples{
