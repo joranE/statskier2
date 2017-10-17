@@ -46,6 +46,11 @@ ss_query <- function(con,q){
   dbGetQuery(con,q)
 }
 
+#' @export
+ss_query_ <- function(sql,con){
+  dbGetQuery(con,sql)
+}
+
 choose_src <- function(){
   if (!is.null(options()$sqlite_path) && file.exists(options()$sqlite_path)){
     src <- src_sqlite(path = options()$sqlite_path,create = FALSE)
