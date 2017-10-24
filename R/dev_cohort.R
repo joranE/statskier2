@@ -58,15 +58,3 @@ dev_cohort <- function(ath,top_k = 5,times = 10,
   return(list(plot = p,cohort_data = cohort_data,ath_data = ath_data))
 
 }
-
-
-
-top_k <- 5
-times <- 10
-aths <- c('STEPHEN Elizabeth','HOFFMAN Noah')
-ci_lims <- c(min = 0.1,max = 0.9)
-
-
-
-
-
