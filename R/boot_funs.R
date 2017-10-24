@@ -53,7 +53,7 @@ bs_median <- function(vec,B = 1000){
 bs_quantile <- function(vec,probs,B = 1000){
   n <- length(vec)
   vec <- vec[!is.na(vec)]
-  if (n == 1) return(rep(NA,B))
+  if (n == 1) return(list(orig = NA,bs = matrix(rep(NA,B*length(probs)),B,length(probs))))
   orig <- quantile(x = vec,probs = probs)
   mat <- matrix(vec[sample(n,n*B,replace = TRUE)],nrow = n,ncol = B,byrow = FALSE)
   #mat <- replicate(n = B,sample(x = vec,size = length(vec),replace = TRUE))
