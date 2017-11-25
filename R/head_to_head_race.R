@@ -49,7 +49,8 @@ hth_race <- function(ath_names,
   hth_df <- hth_data(athletes = ath_names,
                      opponents = opp_names) %>%
     filter(n_races >= min_encounters &
-             race_day - as.integer(as.Date(date)) <= cutoff)
+             race_day - as.integer(as.Date(date)) <= cutoff &
+             type == race_info$type)
 
   if (events == 'maj_int'){
     hth_df <- filter(hth_df,cat1 %in% c('WC','TDS','OWG','WSC'))
