@@ -4,6 +4,7 @@
 #' distance events.
 #'
 #' @param race_id integer race id
+#' @param title race title
 #' @param cutoff integer number of days in past to gether data from
 #' @param reduced boolean; if \code{TRUE} only show top 30 plus North Americans
 #' @return A named list with components:
@@ -23,6 +24,7 @@
 #' print(p$plot)
 #' }
 race_snapshot_dst <- function(race_id,
+                              title = "",
                               cutoff = 365 * 4,
                               reduced = TRUE){
 
@@ -161,6 +163,8 @@ race_snapshot_dst <- function(race_id,
     geom_point(data = cur_race,aes(x = mpb,y = name1),color = "red") +
     geom_point(data = ath_min,aes(x = mpb,y = name1),alpha = 0.5) +
     scale_fill_manual(values = c('red','blue')) +
+    ggtitle(label = paste("Race Snapshot - ",title),
+            subtitle = "For >=10 prior races, bars represent 25th-75th percentile of past performance") +
     labs(x = 'Standardized % Behind Median Skier',y = 'Athlete',
          fill = "",caption = "statisticalskier.com - @statskier")
 
@@ -174,6 +178,7 @@ race_snapshot_dst <- function(race_id,
 #' @rdname race_snapshot_dst
 #' @export
 race_snapshot_spr <- function(race_id,
+                              title = "",
                               cutoff = 365 * 4,
                               reduced = TRUE){
 
@@ -284,6 +289,8 @@ race_snapshot_spr <- function(race_id,
     geom_point(data = cur_race,aes(x = rank,y = name1),color = "red") +
     geom_point(data = ath_min,aes(x = rank,y = name1),alpha = 0.5) +
     scale_fill_manual(values = c('red','blue')) +
+    ggtitle(label = paste("Race Snapshot - ",title),
+            subtitle = "For >=10 prior races, bars represent 25th-75th percentile of past performance") +
     labs(x = 'Finishing Place',y = 'Athlete',
          fill = "",caption = "statisticalskier.com - @statskier")
 
