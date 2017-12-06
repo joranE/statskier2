@@ -34,7 +34,7 @@ race_snapshot_dst <- function(race_id,
     collect() %>%
     mpb() %>%
     standardize_mpb() %>%
-    mutate(name1 = paste(extract_all_caps(name),rank)) %>%
+    mutate(name1 = paste(shorten_names(name),rank)) %>%
     arrange(rank)
 
   if (reduced){
@@ -186,7 +186,7 @@ race_snapshot_spr <- function(race_id,
     filter(raceid == race_id) %>%
     arrange(rank) %>%
     collect() %>%
-    mutate(name1 = paste(extract_all_caps(name),rank)) %>%
+    mutate(name1 = paste(shorten_names(name),rank)) %>%
     arrange(rank)
 
   if (reduced){
