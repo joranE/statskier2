@@ -5,12 +5,14 @@
 \alias{race_snapshot_spr}
 \title{Race Snapshots}
 \usage{
-race_snapshot_dst(race_id, cutoff = 365 * 4, reduced = TRUE)
+race_snapshot_dst(race_id, title = "", cutoff = 365 * 4, reduced = TRUE)
 
-race_snapshot_spr(race_id, cutoff = 365 * 4, reduced = TRUE)
+race_snapshot_spr(race_id, title = "", cutoff = 365 * 4, reduced = TRUE)
 }
 \arguments{
 \item{race_id}{integer race id}
+
+\item{title}{race title}
 
 \item{cutoff}{integer number of days in past to gether data from}
 
