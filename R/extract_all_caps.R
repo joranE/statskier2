@@ -14,9 +14,11 @@ extract_all_caps <- function(x){
 #'
 #' @param x character vector of skier names
 #' @importFrom stringr str_to_title
+#' @importFrom purrr map
 #' @export
 shorten_names <- function(x){
   x %>%
-    stringr::str_extract(string = .,pattern = "^[A-Z]*") %>%
+    stringr::str_extract_all(string = .,pattern = "\\b[A-Z]+\\b") %>%
+    purrr::map(.f = paste,collapse = " ") %>%
     stringr::str_to_title()
 }
