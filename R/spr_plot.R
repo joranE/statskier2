@@ -68,6 +68,7 @@ spr_plot <- function(ath_names,by_tech = FALSE){
              stat = "identity") +
     geom_hline(yintercept = 0,color = "black") +
     labs(x = NULL,y = "Number of Races",fill = "Max\nround\nreached") +
+    scale_y_continuous(labels = abs) +
     scale_fill_manual(values = RColorBrewer::brewer.pal(6,"Blues")[c(6,3:5)],
                       breaks = c('Final','Semi','Quarter','Qual')) +
     theme(axis.text.x = element_text(hjust = 0,vjust = 1,angle = 310))
