@@ -10,5 +10,5 @@ shorten_names(x)
 \item{x}{character vector of skier names}
 }
 \description{
-Grabs the all caps portion and applies title case
+Grabs the all caps portion or a string and applies title case
 }

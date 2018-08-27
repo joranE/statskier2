@@ -9,12 +9,14 @@ dev_cohort(ath, top_k = 5, times = 10, ci_lims = c(min = 0.1, max = 0.9))
 \arguments{
 \item{ath}{character vector of athlete names}
 
-\item{top_k}{integer}
+\item{top_k}{integer; cohort includes athletes finishing in the `top_k`}
 
-\item{times}{integer}
+\item{times}{integer; cohort includes athletes finishing in the `top_k` at
+least `times` times.}
 
 \item{ci_lims}{named vector defining CI limits for estimating the median}
 }
 \description{
-Athlete Development Trend
+Plot athlete development relative to a cohort of top athletes at equivalent
+ages.
 }

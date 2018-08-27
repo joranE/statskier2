@@ -2,7 +2,7 @@ Package: statskier2
 Type: Package
 Title: Statistical Skier Tools
 Version: 0.1
-Imports:
+Imports: 
     DBI,
     RSQLite,
     RMySQL,
@@ -12,7 +12,8 @@ Imports:
     tidyr,
     RColorBrewer,
     squr,
-    matrixStats
+    matrixStats,
+    Rcpp
 Date: 2015-12-08
 Author: Joran Elias
 Maintainer: Joran Elias <statisticalskier@gmail.com>
@@ -24,3 +25,5 @@ Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr
 ByteCompile: true
+LinkingTo: 
+    Rcpp

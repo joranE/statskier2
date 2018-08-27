@@ -10,5 +10,7 @@ spr_elo_data(default_rating = 1300)
 \item{default_rating}{skiers default rating}
 }
 \description{
-Generate ELO Sprint Input Data
+Organizes race data into a list by race event that can then be passed to
+the functions `skierELO::calc_elo_dst()` or `skierELO::calc_elo_spr()` to
+generate ELO ratings.
 }

@@ -12,11 +12,12 @@ hth_spr(ath1, ath2, races = c("maj_int", "fis"), measure = c("fispoints",
   "rank"), by_tech = FALSE, by_start = FALSE)
 }
 \arguments{
-\item{ath1}{character; single athlete of interest}
+\item{ath1}{character; single athlete name of interest}
 
-\item{ath2}{character vector of athletes to compare with}
+\item{ath2}{character vector of athlete names to compare with}
 
-\item{races}{character; one of "maj_int" or "fis"}
+\item{races}{character; one of "maj_int" (major international races) or "fis"
+(all FIS races).}
 
 \item{measure}{character; one of "fispoints", "rank", "pb".}
 

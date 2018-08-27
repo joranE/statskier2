@@ -7,7 +7,7 @@
 wjc_u23_plot(nations, races = c("WJC", "U23"))
 }
 \arguments{
-\item{nations}{character vector of nations}
+\item{nations}{character vector of nation codes, eg "USA", "CAN", etc.}
 
 \item{races}{character; one of "WJC" or "U23"}
 }

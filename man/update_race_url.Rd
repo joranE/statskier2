@@ -14,7 +14,7 @@ update_race_url(raceid, url1 = NA, url2 = NA)
 \item{url2}{character}
 }
 \description{
-Only available to those with UPDATE priviledges
+Only available to those with UPDATE priviledges for the db.
 }
 \seealso{
 Other race info functions: \code{\link{open_race_url}}

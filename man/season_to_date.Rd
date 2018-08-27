@@ -11,5 +11,6 @@ season_to_date(x)
 }
 \description{
 Converts season string like \code{2010-2011} to a date string like
-\code{2011-01-01}.
+\code{2011-01-01}. Useful when plotting data that has been summarized by
+season.
 }

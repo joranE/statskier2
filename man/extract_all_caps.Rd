@@ -10,5 +10,6 @@ extract_all_caps(x)
 \item{x}{character vector}
 }
 \description{
-Extract All Cap Words
+Helper function to extract only the portion of a string that is in all caps.
+Useful for athlete name parsing since FIS displays names as: LAST_NAME First_Name.
 }
