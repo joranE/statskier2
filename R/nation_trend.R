@@ -63,7 +63,7 @@ nation_trend <- function(nations,
                 Top10 = sum(rank <= 10,na.rm = TRUE),
                 Top30 = sum(rank <= 30,na.rm = TRUE)) %>%
       left_join(race_data,by = "season") %>%
-      mutate_each(funs(prop = . / n_races),Wins:Top30) %>%
+      mutate_at(.funs = funs(prop = . / n_races),.vars = c("Wins","Top3","Top5","Top10","Top30")) %>%
       select(-n_races) %>%
       gather(key = Result,value = Proportion,Wins:Top30) %>%
       mutate(Result = factor(Result,levels = c('Wins','Top3','Top5','Top10','Top30')))
@@ -77,7 +77,7 @@ nation_trend <- function(nations,
                 Top12 = sum(rank <= 12,na.rm = TRUE),
                 Top30 = sum(rank <= 30,na.rm = TRUE)) %>%
       left_join(race_data,by = "season") %>%
-      mutate_each(funs(prop = . / n_races),Wins:Top30) %>%
+      mutate_at(.funs = funs(prop = . / n_races),.vars = c("Wins","Top3","Top5","Top10","Top30")) %>%
       select(-n_races) %>%
       gather(key = Result,value = Proportion,Wins:Top30) %>%
       mutate(Result = factor(Result,levels = c('Wins','Top3','Top6','Top12','Top30')))
@@ -85,7 +85,9 @@ nation_trend <- function(nations,
 
   nation_summary$facet_nation <- paste0(nation_summary$nation," (",paste(race_gender,race_type,sep = ","),")")
 
-  p <- ggplot(nation_summary,aes(x = season,y = Proportion,color = Result)) +
+  nation_summary <- mutate(nation_summary,date = season_to_date(season))
+
+  p <- ggplot(nation_summary,aes(x = as.Date(date),y = Proportion,color = Result)) +
     facet_wrap(~facet_nation) +
     geom_point() +
     geom_line(aes(group = Result)) +
