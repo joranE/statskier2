@@ -34,7 +34,6 @@ bs_median <- function(vec,B = 1000){
   if (n == 1) return(list(orig = NA,bs = rep(NA,B)))
   orig <- median(vec)
   mat <- matrix(vec[sample(n,n*B,replace = TRUE)],nrow = n,ncol = B,byrow = FALSE)
-  #mat <- replicate(n = B,sample(x = vec,size = length(vec),replace = TRUE))
   bs_vals <- matrixStats::colMedians(mat)
   list(orig = orig,bs = bs_vals)
 }
@@ -56,7 +55,26 @@ bs_quantile <- function(vec,probs,B = 1000){
   if (n == 1) return(list(orig = NA,bs = matrix(rep(NA,B*length(probs)),B,length(probs))))
   orig <- quantile(x = vec,probs = probs)
   mat <- matrix(vec[sample(n,n*B,replace = TRUE)],nrow = n,ncol = B,byrow = FALSE)
-  #mat <- replicate(n = B,sample(x = vec,size = length(vec),replace = TRUE))
   bs_vals <- matrixStats::colQuantiles(mat,probs = probs)
   list(orig = orig,bs = bs_vals)
+}
+
+#' Bootstrap MAD
+#'
+#' Bootstrap median absolute deviation of a vector.
+#'
+#' @param vec vector of values
+#' @param B integer; number of bootstrap replicates
+#' @return A list with components \code{orig} with the original statistic and
+#' \code{bs} a matrix whose columns are the bootstrapped statistics
+#' @importFrom matrixStats colQuantiles
+#' @export
+bs_mads <- function(vec,B = 1000){
+  n <- length(vec)
+  vec <- vec[!is.na(vec)]
+  if (n == 1) return(list(orig = NA,bs = rep(NA,B),n = n))
+  orig <- mad(vec)
+  mat <- matrix(vec[sample(n,n*B,replace = TRUE)],nrow = n,ncol = B,byrow = FALSE)
+  bs_vals <- matrixStats::colMads(mat)
+  list(orig = orig,bs = bs_vals,n = n)
 }
