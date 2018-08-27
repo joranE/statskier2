@@ -1,8 +1,12 @@
 #' Athlete Development Trend
 #'
+#' Plot athlete development relative to a cohort of top athletes at equivalent
+#' ages.
+#'
 #' @param ath character vector of athlete names
-#' @param top_k integer
-#' @param times integer
+#' @param top_k integer; cohort includes athletes finishing in the `top_k`
+#' @param times integer; cohort includes athletes finishing in the `top_k` at
+#' least `times` times.
 #' @param ci_lims named vector defining CI limits for estimating the median
 #' @import squr
 #' @export
@@ -55,6 +59,7 @@ dev_cohort <- function(ath,top_k = 5,times = 10,
     ggtitle(label = title,subtitle = subtitle) +
     coord_cartesian(xlim = ath_age_range)
 
-  return(list(plot = p,cohort_data = cohort_data,ath_data = ath_data))
-
+  return(list(plot = p,
+              cohort_data = cohort_data,
+              ath_data = ath_data))
 }

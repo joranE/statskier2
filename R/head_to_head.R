@@ -4,9 +4,10 @@
 #' data. Use these to compare some athletes (\code{ath1}) to a
 #' collection of other athletes (\code{ath2}).
 #'
-#' @param ath1 character; single athlete of interest
-#' @param ath2 character vector of athletes to compare with
-#' @param races character; one of "maj_int" or "fis"
+#' @param ath1 character; single athlete name of interest
+#' @param ath2 character vector of athlete names to compare with
+#' @param races character; one of "maj_int" (major international races) or "fis"
+#' (all FIS races).
 #' @param measure character; one of "fispoints", "rank", "pb".
 #' @param by_tech boolean; split trend lines by technique. Only one of
 #' \code{by_tech} and \code{by_start} can by \code{TRUE}.

@@ -1,3 +1,7 @@
+#' Scrape Race Start Lists
+#'
+#' Simple function to grab start lists from FIS website.
+#'
 #' @import rvest
 #' @export
 read_start_list <- function(url,type = c('sprint','distance')){

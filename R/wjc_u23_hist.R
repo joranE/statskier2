@@ -3,7 +3,7 @@
 #' Results trends for nations at either World Juniors or
 #' U23s, by gender and race type.
 #'
-#' @param nations character vector of nations
+#' @param nations character vector of nation codes, eg "USA", "CAN", etc.
 #' @param races character; one of "WJC" or "U23"
 #' @return A named list with components:
 #' \enumerate{

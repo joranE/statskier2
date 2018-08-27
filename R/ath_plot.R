@@ -2,7 +2,7 @@
 #'
 #' Faceted plots of results over time for one or several athletes using
 #' either FIS points, median percent back or finishing place as
-#' a measure of performance. Includes summaries by season or season and
+#' a measure of performance. Includes summaries by season or by season and
 #' technique.
 #'
 #' @param ath_names character vector of athlete names

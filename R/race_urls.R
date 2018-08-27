@@ -35,7 +35,7 @@ open_race_url <- function(raceid){
 
 #' Update Race URLs
 #'
-#' Only available to those with UPDATE priviledges
+#' Only available to those with UPDATE priviledges for the db.
 #'
 #' @param raceid integer race id
 #' @param url1 character
