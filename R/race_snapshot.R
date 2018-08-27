@@ -20,7 +20,7 @@
 #' @examples
 #' \dontrun{
 #' library(ggplot2)
-#' p <- race_snapshot_dst(raceid = 7902)
+#' p <- race_snapshot_dst(race_id = 7902)
 #' print(p$plot)
 #' }
 race_snapshot_dst <- function(race_id,
