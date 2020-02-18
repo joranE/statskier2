@@ -5,6 +5,18 @@ lagAvgTopN <- function(values, endDates, n, window, adj) {
     .Call('_statskier2_lagAvgTopN', PACKAGE = 'statskier2', values, endDates, n, window, adj)
 }
 
+lagMedianAll <- function(values, endDates, window, adj) {
+    .Call('_statskier2_lagMedianAll', PACKAGE = 'statskier2', values, endDates, window, adj)
+}
+
+lagMAD <- function(values, endDates, window) {
+    .Call('_statskier2_lagMAD', PACKAGE = 'statskier2', values, endDates, window)
+}
+
+lagSD <- function(values, endDates, window) {
+    .Call('_statskier2_lagSD', PACKAGE = 'statskier2', values, endDates, window)
+}
+
 ptsThresh <- function(values, endDates, window) {
     .Call('_statskier2_ptsThresh', PACKAGE = 'statskier2', values, endDates, window)
 }

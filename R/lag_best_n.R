@@ -4,6 +4,8 @@
 #' from \code{x} over the previous \code{window} days. Assumes that \code{x}
 #' and \code{index} are already in order according to \code{index}.
 #'
+#' This is done entirely in R, so it can be quite slow on large data sets.
+#'
 #' @param x numeric vector of values
 #' @param index dates, assumed to be character in YYYY-MM-DD format
 #' @param best_n integer
@@ -47,6 +49,54 @@ lag_best_n <- function(x,index,best_n = 5,
 lag_best_avg <- function(x,dates,n = 5L,window = 365L,adj = c(1.4,1.3,1.2,1.1,1)){
   dates <- as.integer(as.Date(dates))
   lagAvgTopN(values = x,endDates = dates,n = n,window = window,adj = adj)
+}
+
+#' Lagged Median All Results
+#'
+#' Median result over the past calendar window in days.
+#'
+#' @param x numeric vector of values
+#' @param dates dates, assumed to be character in YYYY-MM-DD format
+#' @param n integer
+#' @param window integer; previous number of days to examine
+#' @param adj vector of adjustments for when there are fewer than \code{n}
+#' values.
+#' @export
+lag_median <- function(x,dates,window = 365L,adj = c(1.4,1.3,1.2,1.1,1)){
+  dates <- as.integer(as.Date(dates))
+  lagMedianAll(values = x,endDates = dates,window = window,adj = adj)
+}
+
+#' Lagged Median All Results
+#'
+#' Median result over the past calendar window in days.
+#'
+#' @param x numeric vector of values
+#' @param dates dates, assumed to be character in YYYY-MM-DD format
+#' @param n integer
+#' @param window integer; previous number of days to examine
+#' @param adj vector of adjustments for when there are fewer than \code{n}
+#' values.
+#' @export
+lag_mad <- function(x,dates,window = 365L){
+  dates <- as.integer(as.Date(dates))
+  lagMAD(values = x,endDates = dates,window = window)
+}
+
+#' Lagged Median All Results
+#'
+#' Median result over the past calendar window in days.
+#'
+#' @param x numeric vector of values
+#' @param dates dates, assumed to be character in YYYY-MM-DD format
+#' @param n integer
+#' @param window integer; previous number of days to examine
+#' @param adj vector of adjustments for when there are fewer than \code{n}
+#' values.
+#' @export
+lag_sd <- function(x,dates,window = 365L){
+  dates <- as.integer(as.Date(dates))
+  lagSD(values = x,endDates = dates,window = window)
 }
 
 #' FIS Point Threshold Necessary to Raise/Lower Athlete's Point

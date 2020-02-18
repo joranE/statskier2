@@ -5,13 +5,19 @@
 #' generate ELO ratings.
 #'
 #' @param default_rating skiers default rating
+#' @param maj_int boolean; restrict to only major international races
 #' @export
-dst_elo_data <- function(default_rating = 1300){
+dst_elo_data <- function(default_rating = 1300,maj_int = FALSE){
 
   dst <- tbl(src = options()$statskier_src,"main") %>%
     filter(type == 'Distance') %>%
     arrange(date,raceid,rank) %>%
     collect()
+
+  if (maj_int){
+    dst <- dst %>%
+      filter(cat1 %in% MAJ_INT)
+  }
 
   current_rating_dst <- dst %>%
     select(gender,fisid,name,nation,date) %>%
@@ -37,13 +43,19 @@ dst_elo_data <- function(default_rating = 1300){
 #'
 #'
 #' @param default_rating skiers default rating
+#' @param maj_int boolean; restrict to only major international races
 #' @export
-spr_elo_data <- function(default_rating = 1300){
+spr_elo_data <- function(default_rating = 1300,maj_int = FALSE){
 
   spr <- tbl(src = options()$statskier_src,"main") %>%
     filter(type == 'Sprint') %>%
     arrange(date,raceid,rank) %>%
     collect()
+
+  if (maj_int){
+    spr <- spr %>%
+      filter(cat1 %in% MAJ_INT)
+  }
 
   current_rating_spr <- spr %>%
     select(gender,fisid,name,nation,date) %>%

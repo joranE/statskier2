@@ -13,13 +13,74 @@ NumericVector lagAvgTopN(NumericVector values,NumericVector endDates,int n,int w
     int lenCur = valuesWindow.length();
 
     if (lenCur <= n){
-      //Rcout << "value 1: " << valuesWindow << "\n";
       out[i] = mean(valuesWindow) * adj[lenCur - 1];
     }else{
       std::nth_element(valuesWindow.begin(),valuesWindow.begin() + n,valuesWindow.end());
-      //NumericVector valCopy = clone(valuesWindow);
-      //Rcout << "value 2: " << valCopy << "\n";
       out[i] = mean(head(valuesWindow,n));
+    }
+  }
+  return out;
+}
+
+// [[Rcpp::export]]
+NumericVector lagMedianAll(NumericVector values,NumericVector endDates,int window,NumericVector adj){
+  int valuesLen = values.length();
+  int adj_len = adj.length();
+  NumericVector out = clone(values);
+  NumericVector startDates = endDates - window;
+
+  for (int i = 0; i < valuesLen; ++i){
+    LogicalVector idx = (endDates <= endDates[i]) & (endDates >= startDates[i]);
+    NumericVector valuesWindow = values[idx];
+    int lenCur = valuesWindow.length();
+
+    if (lenCur <= adj_len){
+      out[i] = median(valuesWindow) * adj[lenCur - 1];
+    }else{
+      out[i] = median(valuesWindow);
+    }
+  }
+  return out;
+}
+
+// [[Rcpp::export]]
+NumericVector lagMAD(NumericVector values,NumericVector endDates,int window){
+  int valuesLen = values.length();
+  NumericVector out = clone(values);
+  NumericVector startDates = endDates - window;
+
+  for (int i = 0; i < valuesLen; ++i){
+    LogicalVector idx = (endDates <= endDates[i]) & (endDates >= startDates[i]);
+    NumericVector valuesWindow = values[idx];
+    int lenCur = valuesWindow.length();
+
+    if (lenCur == 1){
+      out[i] = NA_REAL;
+    }else{
+      double c = median(valuesWindow);
+      valuesWindow = valuesWindow - c;
+      valuesWindow = abs(valuesWindow);
+      out[i] = median(valuesWindow);
+    }
+  }
+  return out;
+}
+
+// [[Rcpp::export]]
+NumericVector lagSD(NumericVector values,NumericVector endDates,int window){
+  int valuesLen = values.length();
+  NumericVector out = clone(values);
+  NumericVector startDates = endDates - window;
+
+  for (int i = 0; i < valuesLen; ++i){
+    LogicalVector idx = (endDates <= endDates[i]) & (endDates >= startDates[i]);
+    NumericVector valuesWindow = values[idx];
+    int lenCur = valuesWindow.length();
+
+    if (lenCur == 1){
+      out[i] = NA_REAL;
+    }else{
+      out[i] = sd(valuesWindow);
     }
   }
   return out;

@@ -18,5 +18,7 @@ open_race_url(raceid = 7902)
 }
 }
 \seealso{
-Other race info functions: \code{\link{update_race_url}}
+Other race info functions: 
+\code{\link{update_race_url}()}
 }
+\concept{race info functions}

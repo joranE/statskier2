@@ -20,6 +20,46 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// lagMedianAll
+NumericVector lagMedianAll(NumericVector values, NumericVector endDates, int window, NumericVector adj);
+RcppExport SEXP _statskier2_lagMedianAll(SEXP valuesSEXP, SEXP endDatesSEXP, SEXP windowSEXP, SEXP adjSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type endDates(endDatesSEXP);
+    Rcpp::traits::input_parameter< int >::type window(windowSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type adj(adjSEXP);
+    rcpp_result_gen = Rcpp::wrap(lagMedianAll(values, endDates, window, adj));
+    return rcpp_result_gen;
+END_RCPP
+}
+// lagMAD
+NumericVector lagMAD(NumericVector values, NumericVector endDates, int window);
+RcppExport SEXP _statskier2_lagMAD(SEXP valuesSEXP, SEXP endDatesSEXP, SEXP windowSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type endDates(endDatesSEXP);
+    Rcpp::traits::input_parameter< int >::type window(windowSEXP);
+    rcpp_result_gen = Rcpp::wrap(lagMAD(values, endDates, window));
+    return rcpp_result_gen;
+END_RCPP
+}
+// lagSD
+NumericVector lagSD(NumericVector values, NumericVector endDates, int window);
+RcppExport SEXP _statskier2_lagSD(SEXP valuesSEXP, SEXP endDatesSEXP, SEXP windowSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type values(valuesSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type endDates(endDatesSEXP);
+    Rcpp::traits::input_parameter< int >::type window(windowSEXP);
+    rcpp_result_gen = Rcpp::wrap(lagSD(values, endDates, window));
+    return rcpp_result_gen;
+END_RCPP
+}
 // ptsThresh
 NumericVector ptsThresh(NumericVector values, NumericVector endDates, int window);
 RcppExport SEXP _statskier2_ptsThresh(SEXP valuesSEXP, SEXP endDatesSEXP, SEXP windowSEXP) {
@@ -36,6 +76,9 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_statskier2_lagAvgTopN", (DL_FUNC) &_statskier2_lagAvgTopN, 5},
+    {"_statskier2_lagMedianAll", (DL_FUNC) &_statskier2_lagMedianAll, 4},
+    {"_statskier2_lagMAD", (DL_FUNC) &_statskier2_lagMAD, 3},
+    {"_statskier2_lagSD", (DL_FUNC) &_statskier2_lagSD, 3},
     {"_statskier2_ptsThresh", (DL_FUNC) &_statskier2_ptsThresh, 3},
     {NULL, NULL, 0}
 };

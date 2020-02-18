@@ -4,8 +4,14 @@
 \alias{lag_best_n}
 \title{Lagged Best N Values}
 \usage{
-lag_best_n(x, index, best_n = 5, window = 365, .f = mean, adj = c(1.4,
-  1.3, 1.2, 1.1))
+lag_best_n(
+  x,
+  index,
+  best_n = 5,
+  window = 365,
+  .f = mean,
+  adj = c(1.4, 1.3, 1.2, 1.1)
+)
 }
 \arguments{
 \item{x}{numeric vector of values}
@@ -23,4 +29,7 @@ values.}
 Calculates a function (\code{.f}) of the top \code{best_n} values
 from \code{x} over the previous \code{window} days. Assumes that \code{x}
 and \code{index} are already in order according to \code{index}.
+}
+\details{
+This is done entirely in R, so it can be quite slow on large data sets.
 }

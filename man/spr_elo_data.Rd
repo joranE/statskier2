@@ -4,10 +4,12 @@
 \alias{spr_elo_data}
 \title{Generate ELO Sprint Input Data}
 \usage{
-spr_elo_data(default_rating = 1300)
+spr_elo_data(default_rating = 1300, maj_int = FALSE)
 }
 \arguments{
 \item{default_rating}{skiers default rating}
+
+\item{maj_int}{boolean; restrict to only major international races}
 }
 \description{
 Organizes race data into a list by race event that can then be passed to

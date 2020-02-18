@@ -4,9 +4,16 @@
 \alias{hth_race}
 \title{Head-to-Head Against Skiers in a Specific Race}
 \usage{
-hth_race(ath_names, race_id, num_opp = Inf, cutoff = 365 * 5,
-  min_encounters = 1, measure = c("rank", "fispoints", "pb"),
-  events = c("all", "maj_int"), restrict_by = NULL)
+hth_race(
+  ath_names,
+  race_id,
+  num_opp = Inf,
+  cutoff = 365 * 5,
+  min_encounters = 1,
+  measure = c("rank", "fispoints", "pb"),
+  events = c("all", "maj_int"),
+  restrict_by = NULL
+)
 }
 \arguments{
 \item{race_id}{integer}

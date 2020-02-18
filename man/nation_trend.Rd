@@ -4,8 +4,11 @@
 \alias{nation_trend}
 \title{Performance Trends By Nation}
 \usage{
-nation_trend(nations, race_gender = c("Men", "Women"),
-  race_type = c("Distance", "Sprint"))
+nation_trend(
+  nations,
+  race_gender = c("Men", "Women"),
+  race_type = c("Distance", "Sprint")
+)
 }
 \arguments{
 \item{nations}{character vector of nation codes}

@@ -58,13 +58,13 @@ race_snapshot_dst <- function(race_id,
   tech_label <- switch(race_tech,
                        'F' = 'Freestyle',
                        'C' = 'Classic',
-                       'FC' = 'Pursuit')
+                       'FC' = 'Skiathlon')
 
   cutoff_date <- as.character(as.Date(race_date) - cutoff)
 
   race_history <- tbl(src = options()$statskier_src,"main") %>%
     filter(cat1 %in% MAJ_INT &
-             name %in% cur_race$name &
+             name %in% local(cur_race$name) &
              type == 'Distance' &
              date < race_date &
              date >= cutoff_date) %>%
@@ -158,15 +158,16 @@ race_snapshot_dst <- function(race_id,
     geom_rect(data = block,
               aes(ymin = ymn,ymax = ymx,
                   xmin = -Inf,xmax = Inf,
-                  fill = block),alpha = 0.1,show.legend = FALSE) +
+                  fill = block),alpha = 0.25,show.legend = FALSE) +
     geom_segment(data = ath_bars,aes(x = q25,xend = q75,y = name1,yend = name1)) +
     geom_point(data = cur_race,aes(x = mpb,y = name1),color = "red") +
     geom_point(data = ath_min,aes(x = mpb,y = name1),alpha = 0.5) +
-    scale_fill_manual(values = c('red','blue')) +
+    scale_fill_manual(values = c('#778899','#2F4F4F')) +
     ggtitle(label = paste("Race Snapshot - ",title),
             subtitle = "For >=10 prior races, bars represent 25th-75th percentile of past performance") +
     labs(x = 'Standardized % Behind Median Skier',y = 'Athlete',
-         fill = "",caption = "statisticalskier.com - @statskier")
+         fill = "",caption = "statisticalskier.com - @statskier") +
+    theme_bw()
 
   return(list(plot = p,
               cur_race = cur_race,
@@ -203,7 +204,7 @@ race_snapshot_spr <- function(race_id,
 
   race_history <- tbl(src = options()$statskier_src,"main") %>%
     filter(cat1 %in% MAJ_INT &
-             name %in% cur_race$name &
+             name %in% local(cur_race$name) &
              type == 'Sprint' &
              date < race_date &
              date >= cutoff_date) %>%
@@ -244,7 +245,7 @@ race_snapshot_spr <- function(race_id,
   n_race <- nrow(cur_race)
   n_block <- (n_race %/% 10) + ((n_race %% 10) > 0)
 
-  mn_idx <- c(1,1+which(seq_len(n_race) %% 10 == 0))
+  mn_idx <- c(1,1 + which(seq_len(n_race) %% 10 == 0))
   mx_idx <- c(which(seq_len(n_race) %% 10 == 0),n_race)
 
   block <- data.frame(ymn = cur_race$name1[mn_idx[seq_len(n_block)]],
@@ -284,15 +285,16 @@ race_snapshot_spr <- function(race_id,
     geom_rect(data = block,
               aes(ymin = ymn,ymax = ymx,
                   xmin = -Inf,xmax = Inf,
-                  fill = block),alpha = 0.1,show.legend = FALSE) +
+                  fill = block),alpha = 0.25,show.legend = FALSE) +
     geom_segment(data = ath_bars,aes(x = q25,xend = q75,y = name1,yend = name1)) +
-    geom_point(data = cur_race,aes(x = rank,y = name1),color = "red") +
     geom_point(data = ath_min,aes(x = rank,y = name1),alpha = 0.5) +
-    scale_fill_manual(values = c('red','blue')) +
+    geom_point(data = cur_race,aes(x = rank,y = name1),color = "red") +
+    scale_fill_manual(values = c('#778899','#2F4F4F')) +
     ggtitle(label = paste("Race Snapshot - ",title),
             subtitle = "For >=10 prior races, bars represent 25th-75th percentile of past performance") +
     labs(x = 'Finishing Place',y = 'Athlete',
-         fill = "",caption = "statisticalskier.com - @statskier")
+         fill = "",caption = "statisticalskier.com - @statskier") +
+    theme_bw()
 
   return(list(plot = p,
               cur_race = cur_race,

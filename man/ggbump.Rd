@@ -4,8 +4,15 @@
 \alias{ggbump}
 \title{importFrom tidyr gather}
 \usage{
-ggbump(grp_var, data, offset.x = 0.1, xlab = NULL, yrev = TRUE,
-  title = NULL, subtitle = NULL)
+ggbump(
+  grp_var,
+  data,
+  offset.x = 0.1,
+  xlab = NULL,
+  yrev = TRUE,
+  title = NULL,
+  subtitle = NULL
+)
 }
 \description{
 importFrom tidyr gather

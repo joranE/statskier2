@@ -5,11 +5,23 @@
 \alias{hth_spr}
 \title{Head-to-head Plots & Data}
 \usage{
-hth_dst(ath1, ath2, races = c("maj_int", "fis"), measure = c("fispoints",
-  "rank", "pb"), by_tech = FALSE, by_start = FALSE)
+hth_dst(
+  ath1,
+  ath2,
+  races = c("maj_int", "fis"),
+  measure = c("fispoints", "rank", "pb"),
+  by_tech = FALSE,
+  by_start = FALSE
+)
 
-hth_spr(ath1, ath2, races = c("maj_int", "fis"), measure = c("fispoints",
-  "rank"), by_tech = FALSE, by_start = FALSE)
+hth_spr(
+  ath1,
+  ath2,
+  races = c("maj_int", "fis"),
+  measure = c("fispoints", "rank"),
+  by_tech = FALSE,
+  by_start = FALSE
+)
 }
 \arguments{
 \item{ath1}{character; single athlete name of interest}

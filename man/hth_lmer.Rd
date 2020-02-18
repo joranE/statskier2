@@ -4,9 +4,17 @@
 \alias{hth_lmer}
 \title{Assess Head-to-Head Performance Using lmer Model}
 \usage{
-hth_lmer(ath_names, race_id, num_opp = Inf, cutoff = 365 * 5,
-  min_encounters = 1, measure = c("rank", "fispoints", "pb"),
-  events = c("all", "maj_int"), restrict_by = NULL, race_title = "")
+hth_lmer(
+  ath_names,
+  race_id,
+  num_opp = Inf,
+  cutoff = 365 * 5,
+  min_encounters = 1,
+  measure = c("rank", "fispoints", "pb"),
+  events = c("all", "maj_int"),
+  restrict_by = NULL,
+  race_title = ""
+)
 }
 \arguments{
 \item{ath_names}{character vector of athlete names}

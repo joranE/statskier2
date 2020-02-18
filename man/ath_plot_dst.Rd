@@ -5,11 +5,21 @@
 \alias{ath_plot_spr}
 \title{Sprint & Distance Results Plots By Athlete}
 \usage{
-ath_plot_dst(ath_names, races = c("maj_int", "fis"), by_tech = FALSE,
-  collapse = NULL, use_rank = FALSE)
+ath_plot_dst(
+  ath_names,
+  races = c("maj_int", "fis"),
+  by_tech = FALSE,
+  collapse = NULL,
+  use_rank = FALSE
+)
 
-ath_plot_spr(ath_names, races = c("maj_int", "fis"), by_tech = FALSE,
-  collapse = NULL, use_rank = TRUE)
+ath_plot_spr(
+  ath_names,
+  races = c("maj_int", "fis"),
+  by_tech = FALSE,
+  collapse = NULL,
+  use_rank = TRUE
+)
 }
 \arguments{
 \item{ath_names}{character vector of athlete names}
