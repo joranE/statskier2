@@ -3,3 +3,5 @@
 .RData
 *.Rproj
 statskier2.Rproj
+*.Rmd
+.gitignore
