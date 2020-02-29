@@ -40,17 +40,14 @@ ath_plot_dst <- function(ath_names,
     races <- "maj_int"
   }
 
-  ath_data <- tbl(src = options()$statskier_src,"main") %>%
-    filter(name %in% ath_names &
-             type == 'Distance') %>%
+  ath_data <- tbl(src = conl,"v_distance") %>%
+    filter(name %in% ath_names) %>%
     collect() %>%
     mutate(tech_name = ifelse(tech == 'C','Classic',
                               ifelse(tech == 'F','Freestyle','Pursuit')))
 
   if (races == "maj_int"){
-    ath_data <- filter(ath_data,cat1 %in% MAJ_INT) %>%
-      mpb() %>%
-      standardize_mpb()
+    ath_data <- filter(ath_data,cat1 %in% MAJ_INT)
   }
 
   if (!is.null(collapse)){
@@ -64,8 +61,8 @@ ath_plot_dst <- function(ath_names,
       ath_data$y <- ath_data$rank
       ylab <- "Finishing Place"
     }else{
-      ath_data$y <- ath_data$mpb
-      ylab <- "Standardized % Back From Median Skier"
+      ath_data$y <- ath_data$pbm
+      ylab <- "% Back From Median Skier"
     }
   }else{
     ath_data$y <- ath_data$fispoints
@@ -79,7 +76,7 @@ ath_plot_dst <- function(ath_names,
   }
 
   ath_summary <- ath_data %>%
-    group_by_(.dots = grps) %>%
+    group_by_at(.vars = grps) %>%
     summarise(med = median(y,na.rm = TRUE),
               n = n()) %>%
     as.data.frame() %>%
@@ -116,6 +113,7 @@ ath_plot_dst <- function(ath_names,
     labs(x = NULL,
          y = ylab,
          color = "") +
+    theme_bw() +
     theme(axis.text.x = element_text(angle = 310,
                                      hjust = 0,
                                      vjust = 1),
@@ -143,9 +141,8 @@ ath_plot_spr <- function(ath_names,
     races <- "maj_int"
   }
 
-  ath_data <- tbl(src = options()$statskier_src,"main") %>%
-    filter(name %in% ath_names &
-             type == 'Sprint') %>%
+  ath_data <- tbl(src = conl,"v_sprint") %>%
+    filter(name %in% ath_names) %>%
     collect() %>%
     mutate(tech_name = ifelse(tech == 'C','Classic','Freestyle'))
 
@@ -174,7 +171,7 @@ ath_plot_spr <- function(ath_names,
   }
 
   ath_summary <- ath_data %>%
-    group_by_(.dots = grps) %>%
+    group_by_at(.vars = grps) %>%
     summarise(med = median(y,na.rm = TRUE),
               n = n()) %>%
     as.data.frame() %>%
@@ -212,6 +209,7 @@ ath_plot_spr <- function(ath_names,
     labs(x = NULL,
          y = ylab,
          color = "") +
+    theme_bw() +
     theme(axis.text.x = element_text(angle = 310,
                                      hjust = 0,
                                      vjust = 1),

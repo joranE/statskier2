@@ -45,7 +45,7 @@ db_xc_remote <- function(){
 #' conl <- db_xc_local()
 #' ss_query(conl,"select * from main where name = 'RANDALL Kikkan' limit 3")
 #' }
-ss_query <- function(con,q){
+ss_query <- function(q,con){
   dbGetQuery(con,q)
 }
 

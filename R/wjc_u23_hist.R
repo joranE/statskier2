@@ -18,19 +18,28 @@
 #' print(p$plots$CAN)
 #' }
 wjc_u23_plot <- function(nations,races = c('WJC','U23')){
-
   races <- match.arg(races)
-  wjc <- tbl(src = options()$statskier_src,"main") %>%
+  dst <- tbl(conl,"v_distance") %>%
     filter(cat1 == races &
              nation %in% nations) %>%
     collect()
+  spr <- tbl(conl,"v_sprint") %>%
+    filter(cat1 == races &
+             nation %in% nations) %>%
+    collect()
+
+  dst_spr <- dst %>%
+    mutate(event_type == "Distance") %>%
+    select(event_type,season,date,event_type,gender,compid,nation,rank) %>%
+    bind_rows(mutate(spr,event_type == "Sprint") %>%
+                select(event_type,season,date,event_type,gender,compid,nation,rank))
 
   sprCutoff <- data.frame(type = c('Sprint','Sprint'),
                           gender = c('Men','Women'),
                           yint = c(30,30))
 
-  wjc_med <- wjc %>%
-    group_by(nation,gender,type,season) %>%
+  dst_spr_med <- dst_spr %>%
+    group_by(nation,gender,event_type,season) %>%
     summarise(med = median(rank,na.rm = TRUE)) %>%
     mutate(date = season_to_date(season))
 

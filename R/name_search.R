@@ -17,10 +17,8 @@
 #' }
 find_skier <- function(x){
   x <- paste0("%",x,"%")
-  results <- tbl(src = options()$statskier_src,"main") %>%
-    select(fisid,compid,name,gender,nation) %>%
+  results <- tbl(conl,"skier") %>%
     filter(name %like% x) %>%
-    collect() %>%
-    unique()
+      collect()
   results
 }

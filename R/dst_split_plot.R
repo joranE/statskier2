@@ -2,30 +2,27 @@
 #'
 #' @importFrom egg ggarrange
 #' @export
-dst_split_plot <- function(data,n_skiers = 30,n_seg = 6){
-  conl <- db_xc_local()
-  maj_int <- tbl(conl,"maj_int")
-  race_info <- maj_int %>%
-    filter(raceid == !!data$raceid[1]) %>%
-    select(raceid,date,season,location,tech,length,gender,start) %>%
+dst_split_plot <- function(.eventid,n_skiers = 30,n_seg = 6){
+
+  race_info <- tbl(conl,"v_distance_splits") %>%
+    filter(eventid == .eventid) %>%
+    select(eventid,date,season,location,tech,length,gender,format) %>%
     distinct() %>%
     collect()
 
-  # if (race_info$start == "Handicap"){
-  #   warning("This plot may not make much sense for a handicap start.",immediate. = TRUE)
-  # }
   title <- paste(race_info$date,race_info$location,race_info$gender,
-                 paste0(race_info$length,"km"),race_info$tech,race_info$start)
+                 paste0(race_info$length,"km"),race_info$tech,race_info$format)
 
-  dst_race <- data %>%
-    filter(!is.na(split_km)) %>%
+  dst_race <- tbl(conl,"v_distance_splits") %>%
+    filter(eventid == .eventid & !is.na(split_km)) %>%
+    collect() %>%
     group_by(split_km) %>%
     mutate(time_back = split_time - min(split_time,na.rm = TRUE),
            pct_back = time_back / min(split_time,na.rm = TRUE),
            name = stringr::str_trim(name,side = "both")) %>%
     ungroup()
 
-  if (race_info$start == "Handicap"){
+  if (race_info$format == "Handicap"){
     dst_race <- dst_race %>%
       filter(split_km != min(split_km,na.rm = TRUE))
   }

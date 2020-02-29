@@ -23,17 +23,15 @@
 #' p <- race_snapshot_dst(race_id = 7902)
 #' print(p$plot)
 #' }
-race_snapshot_dst <- function(race_id,
+race_snapshot_dst <- function(event_id,
                               title = "",
                               cutoff = 365 * 4,
                               reduced = TRUE){
 
-  cur_race <- tbl(src = options()$statskier_src,"main") %>%
-    filter(raceid == race_id) %>%
+  cur_race <- tbl(src = conl,"v_distance_maj_int") %>%
+    filter(eventid == event_id) %>%
     arrange(rank) %>%
     collect() %>%
-    mpb() %>%
-    standardize_mpb() %>%
     mutate(name1 = paste(shorten_names(name),rank)) %>%
     arrange(rank)
 
@@ -43,17 +41,17 @@ race_snapshot_dst <- function(race_id,
 
   race_date <- cur_race$date[1]
   race_tech <- cur_race$tech[1]
-  race_start <- switch(cur_race$start[1],
+  race_format <- switch(cur_race$format[1],
                        'Interval' = 'Interval',
-                       'Mass' = c('Mass','Pursuit'),
-                       'Pursuit' = c('Mass','Pursuit'),
-                       'Handicap' = 'Handicap',
+                       'Mass' = c('Mass','Skiathlon'),
+                       'Skiathlon' = c('Mass','Skiathlon'),
+                       'Pursuit' = 'Pursuit',
                        'Pursuit Break' = 'Pursuit Break')
-  start_label <- switch(cur_race$start[1],
+  format_label <- switch(cur_race$format[1],
                         'Interval' = 'Interval',
                         'Mass' = 'Mass',
-                        'Pursuit' = 'Mass',
-                        'Handicap' = 'Handicap',
+                        'Skiathlon' = 'Mass',
+                        'Pursuit' = 'Pursuit',
                         'Pursuit Break' = 'Pursuit Break')
   tech_label <- switch(race_tech,
                        'F' = 'Freestyle',
@@ -62,24 +60,20 @@ race_snapshot_dst <- function(race_id,
 
   cutoff_date <- as.character(as.Date(race_date) - cutoff)
 
-  race_history <- tbl(src = options()$statskier_src,"main") %>%
-    filter(cat1 %in% MAJ_INT &
-             name %in% local(cur_race$name) &
-             type == 'Distance' &
+  race_history <- tbl(src = conl,"v_distance_maj_int") %>%
+    filter(compid %in% local(cur_race$compid) &
              date < race_date &
              date >= cutoff_date) %>%
     collect() %>%
-    mpb() %>%
-    standardize_mpb() %>%
     left_join(cur_race[,c('name','name1')],by = 'name') %>%
     mutate(same_tech = ifelse(tech == race_tech,'Yes','No'),
-           same_start = ifelse(start %in% race_start,'Yes','No')) %>%
+           same_format = ifelse(format %in% race_format,'Yes','No')) %>%
     group_by(name) %>%
     mutate(nrace_overall = n()) %>%
     group_by(name,same_tech) %>%
     mutate(nrace_tech = n()) %>%
-    group_by(name,same_start) %>%
-    mutate(nrace_start = n()) %>%
+    group_by(name,same_format) %>%
+    mutate(nrace_format = n()) %>%
     as.data.frame()
 
   ath_min_races_overall <- race_history %>%
@@ -88,30 +82,30 @@ race_snapshot_dst <- function(race_id,
   ath_min_races_tech <- race_history %>%
     filter(same_tech == 'Yes' & nrace_tech < 10) %>%
     as.data.frame()
-  ath_min_races_start <- race_history %>%
-    filter(same_start == 'Yes' & nrace_start < 10) %>%
+  ath_min_races_format <- race_history %>%
+    filter(same_format == 'Yes' & nrace_format < 10) %>%
     as.data.frame()
-  ath_min <- bind_rows(setNames(list(ath_min_races_overall,ath_min_races_tech,ath_min_races_start),
-                                c('Overall',tech_label,start_label)),
+  ath_min <- bind_rows(setNames(list(ath_min_races_overall,ath_min_races_tech,ath_min_races_format),
+                                c('Overall',tech_label,format_label)),
                        .id = 'facet_grp')
 
   ath_bars_overall <- race_history %>%
     filter(nrace_overall >= 10) %>%
     group_by(name1) %>%
-    summarise(q25 = quantile(mpb,0.25,na.rm = TRUE),
-              q75 = quantile(mpb,0.75,na.rm = TRUE))
+    summarise(q25 = quantile(pbm,0.25,na.rm = TRUE),
+              q75 = quantile(pbm,0.75,na.rm = TRUE))
   ath_bars_tech <- race_history %>%
     filter(same_tech == 'Yes' & nrace_tech >= 10) %>%
     group_by(name1) %>%
-    summarise(q25 = quantile(mpb,0.25,na.rm = TRUE),
-              q75 = quantile(mpb,0.75,na.rm = TRUE))
-  ath_bars_start <- race_history %>%
-    filter(same_start == 'Yes' & nrace_start >= 10) %>%
+    summarise(q25 = quantile(pbm,0.25,na.rm = TRUE),
+              q75 = quantile(pbm,0.75,na.rm = TRUE))
+  ath_bars_format <- race_history %>%
+    filter(same_format == 'Yes' & nrace_format >= 10) %>%
     group_by(name1) %>%
-    summarise(q25 = quantile(mpb,0.25,na.rm = TRUE),
-              q75 = quantile(mpb,0.75,na.rm = TRUE))
-  ath_bars <- bind_rows(setNames(list(ath_bars_overall,ath_bars_tech,ath_bars_start),
-                                 c('Overall',tech_label,start_label)),
+    summarise(q25 = quantile(pbm,0.25,na.rm = TRUE),
+              q75 = quantile(pbm,0.75,na.rm = TRUE))
+  ath_bars <- bind_rows(setNames(list(ath_bars_overall,ath_bars_tech,ath_bars_format),
+                                 c('Overall',tech_label,format_label)),
                         .id = 'facet_grp')
 
   #Make block data
@@ -127,12 +121,12 @@ race_snapshot_dst <- function(race_id,
                       xmx = rep(Inf,n_block),
                       block = rep(c('block1','block2'),length.out = n_block))
   block <- bind_rows(setNames(list(block,block,block),
-                              c('Overall',tech_label,start_label)),
+                              c('Overall',tech_label,format_label)),
                      .id = 'facet_grp')
 
   name_order <- rev(cur_race$name1)
   cur_race <- bind_rows(setNames(list(cur_race,cur_race,cur_race),
-                                 c('Overall',tech_label,start_label)),
+                                 c('Overall',tech_label,format_label)),
                         .id = 'facet_grp')
 
   #Set name order
@@ -144,28 +138,28 @@ race_snapshot_dst <- function(race_id,
 
   #Set facet order
   cur_race$facet_grp <- factor(cur_race$facet_grp,
-                               levels = c(tech_label,start_label,"Overall"))
+                               levels = c(tech_label,format_label,"Overall"))
   ath_min$facet_grp <- factor(ath_min$facet_grp,
-                              levels = c(tech_label,start_label,"Overall"))
+                              levels = c(tech_label,format_label,"Overall"))
   ath_bars$facet_grp <- factor(ath_bars$facet_grp,
-                               levels = c(tech_label,start_label,"Overall"))
+                               levels = c(tech_label,format_label,"Overall"))
   block$facet_grp <- factor(block$facet_grp,
-                            levels = c(tech_label,start_label,"Overall"))
+                            levels = c(tech_label,format_label,"Overall"))
 
   p <- ggplot() +
     facet_wrap(~facet_grp,nrow = 1,scale = "free_x") +
-    geom_blank(data = cur_race,aes(x = mpb,y = name1)) +
+    geom_blank(data = cur_race,aes(x = pbm,y = name1)) +
     geom_rect(data = block,
               aes(ymin = ymn,ymax = ymx,
                   xmin = -Inf,xmax = Inf,
                   fill = block),alpha = 0.25,show.legend = FALSE) +
     geom_segment(data = ath_bars,aes(x = q25,xend = q75,y = name1,yend = name1)) +
-    geom_point(data = cur_race,aes(x = mpb,y = name1),color = "red") +
-    geom_point(data = ath_min,aes(x = mpb,y = name1),alpha = 0.5) +
+    geom_point(data = cur_race,aes(x = pbm,y = name1),color = "red") +
+    geom_point(data = ath_min,aes(x = pbm,y = name1),alpha = 0.5) +
     scale_fill_manual(values = c('#778899','#2F4F4F')) +
     ggtitle(label = paste("Race Snapshot - ",title),
             subtitle = "For >=10 prior races, bars represent 25th-75th percentile of past performance") +
-    labs(x = 'Standardized % Behind Median Skier',y = 'Athlete',
+    labs(x = '% Behind Median Skier',y = 'Athlete',
          fill = "",caption = "statisticalskier.com - @statskier") +
     theme_bw()
 
@@ -178,13 +172,13 @@ race_snapshot_dst <- function(race_id,
 
 #' @rdname race_snapshot_dst
 #' @export
-race_snapshot_spr <- function(race_id,
+race_snapshot_spr <- function(event_id,
                               title = "",
                               cutoff = 365 * 4,
                               reduced = TRUE){
 
-  cur_race <- tbl(src = options()$statskier_src,"main") %>%
-    filter(raceid == race_id) %>%
+  cur_race <- tbl(src = conl,"v_sprint_maj_int") %>%
+    filter(eventid == event_id) %>%
     arrange(rank) %>%
     collect() %>%
     mutate(name1 = paste(shorten_names(name),rank)) %>%
@@ -202,10 +196,8 @@ race_snapshot_spr <- function(race_id,
 
   cutoff_date <- as.character(as.Date(race_date) - cutoff)
 
-  race_history <- tbl(src = options()$statskier_src,"main") %>%
-    filter(cat1 %in% MAJ_INT &
-             name %in% local(cur_race$name) &
-             type == 'Sprint' &
+  race_history <- tbl(src = conl,"v_sprint_maj_int") %>%
+    filter(name %in% local(cur_race$name) &
              date < race_date &
              date >= cutoff_date) %>%
     collect() %>%

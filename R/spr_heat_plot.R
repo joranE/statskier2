@@ -2,20 +2,18 @@
 #'
 #' @importFrom egg ggarrange
 #' @export
-spr_heat_plot <- function(data,subtitle = ""){
-  data <- data %>%
-    filter(dns != "Y" & dnf != "Y")
+spr_heat_plot <- function(.eventid,subtitle = ""){
 
-  conl <- db_xc_local()
-  maj_int <- tbl(conl,"maj_int")
-  race_info <- maj_int %>%
-    filter(raceid == !!data$raceid[1]) %>%
-    select(raceid,date,season,location,tech,length,gender) %>%
+  race_info <- tbl(conl,"v_sprint_heats") %>%
+    filter(eventid == .eventid) %>%
+    select(eventid,date,season,location,tech,length,gender) %>%
     distinct() %>%
     collect()
 
-  spr_qual <- data %>%
-    select(raceid,name,nation,time = qual_time,rank = rankqual) %>%
+  spr_qual <- tbl(conl,"v_sprint") %>%
+    filter(eventid == .eventid) %>%
+    collect() %>%
+    select(eventid,name,nation,time,rank = rankqual) %>%
     mutate(heat = "qual",
            heat = factor(heat,
                          levels = c("qual","quarter","semi","final"),
@@ -23,8 +21,10 @@ spr_heat_plot <- function(data,subtitle = ""){
            qf = NA_integer_,
            sf = NA_integer_,
            fn = NA_integer_)
-  spr_heats <- data %>%
-    select(raceid,name,nation,time = heat_time,rank = heat_rank,qf,sf,fn,heat) %>%
+  spr_heats <- tbl(conl,"v_sprint_heats") %>%
+    filter(eventid == .eventid) %>%
+    collect() %>%
+    select(eventid,name,nation,time = heat_time,rank = heat_rank,qf,sf,fn,heat) %>%
     mutate(heat = case_when(substr(heat,1,1) == "1" ~ "quarter",
                             substr(heat,1,1) == "2" ~ "semi",
                             substr(heat,1,1) == "3" ~ "final"),
@@ -32,10 +32,12 @@ spr_heat_plot <- function(data,subtitle = ""){
                          levels = c("qual","quarter","semi","final"),
                          labels = c("Qual","QF","SF","Final")))
 
-  lls <- data %>%
+  lls <- tbl(conl,"v_sprint_heats") %>%
+    filter(eventid == .eventid) %>%
+    collect() %>%
     filter(ll == "Y") %>%
     select(name,qf,sf) %>%
-    pivot_longer(cols = c("qf","sf"),names_to = "heat") %>%
+    tidyr::pivot_longer(cols = c("qf","sf"),names_to = "heat") %>%
     filter(!is.na(value)) %>%
     mutate(heat = toupper(heat)) %>%
     group_by(name) %>%
@@ -58,6 +60,12 @@ spr_heat_plot <- function(data,subtitle = ""){
   spr_final$name <- factor(spr_final$name,levels = name_lev_ord)
 
   title <- paste(race_info$date,race_info$location,race_info$gender,paste0(race_info$length,"km"),race_info$tech)
+
+  data_clean <- data_clean %>%
+    group_by(name) %>%
+    mutate(qual_only = all(heat == "Qual")) %>%
+    ungroup() %>%
+    filter(!qual_only)
 
   p <- ggplot(data = data_clean,aes(x = heat,y = time,group = name)) +
     geom_line(alpha = 0.5) +
