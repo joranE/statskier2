@@ -31,7 +31,8 @@ hth_race <- function(ath_names,
   measure <- match.arg(measure)
   events = match.arg(events)
 
-  race_data <- tbl(src = options()$statskier_src,"main") %>%
+  race_data <- tbl(src = ..statskier_pg_con..,
+                   dbplyr::in_schema("public","main")) %>%
     filter(raceid == race_id) %>%
     collect() %>%
     filter(rank <= num_opp | name %in% ath_names)

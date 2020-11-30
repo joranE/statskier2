@@ -4,7 +4,8 @@
 #' @export
 dst_split_plot <- function(.eventid,n_skiers = 30,n_seg = 6){
 
-  race_info <- tbl(conl,"v_distance_splits") %>%
+  race_info <- tbl(src = ..statskier_pg_con..,
+                   dbplyr::in_schema("public","v_distance_splits")) %>%
     filter(eventid == .eventid) %>%
     select(eventid,date,season,location,tech,length,gender,format) %>%
     distinct() %>%
@@ -13,16 +14,18 @@ dst_split_plot <- function(.eventid,n_skiers = 30,n_seg = 6){
   title <- paste(race_info$date,race_info$location,race_info$gender,
                  paste0(race_info$length,"km"),race_info$tech,race_info$format)
 
-  dst_race <- tbl(conl,"v_distance_splits") %>%
+  dst_race <- tbl(src = ..statskier_pg_con..,
+                  dbplyr::in_schema("public","v_distance_splits")) %>%
     filter(eventid == .eventid & !is.na(split_km)) %>%
     collect() %>%
     group_by(split_km) %>%
     mutate(time_back = split_time - min(split_time,na.rm = TRUE),
            pct_back = time_back / min(split_time,na.rm = TRUE),
            name = stringr::str_trim(name,side = "both")) %>%
+    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) %>%
     ungroup()
 
-  if (race_info$format == "Handicap"){
+  if (race_info$format == "Pursuit"){
     dst_race <- dst_race %>%
       filter(split_km != min(split_km,na.rm = TRUE))
   }
@@ -56,7 +59,7 @@ dst_split_plot <- function(.eventid,n_skiers = 30,n_seg = 6){
     geom_text(data = top_begin,aes(label = name2),hjust = 1.1,size = 2,color = "blue") +
     geom_text(data = top_end,aes(label = name2),hjust = -0.1,size = 2,color = "blue") +
     geom_text(data = top_seg,aes(label = seg_rank),size = 2.5,color = "red") +
-    scale_x_continuous(breaks = unique(dst_race$split_km),expand = expand_scale(mult = 0.1)) +
+    scale_x_continuous(breaks = unique(dst_race$split_km),expand = expansion(mult = 0.1)) +
     scale_y_continuous(labels = scales::percent) +
     labs(x = NULL,y = "Percent Back") +
     ggtitle(label = title,
@@ -72,7 +75,7 @@ dst_split_plot <- function(.eventid,n_skiers = 30,n_seg = 6){
     geom_text(data = top_begin,aes(label = name2),hjust = 1.1,size = 2,color = "blue") +
     geom_text(data = top_end,aes(label = name2),hjust = -0.1,size = 2,color = "blue") +
     geom_text(data = top_seg,aes(label = seg_rank),size = 2.5,color = "red") +
-    scale_x_continuous(breaks = unique(dst_race$split_km),expand = expand_scale(mult = 0.1)) +
+    scale_x_continuous(breaks = unique(dst_race$split_km),expand = expansion(mult = 0.1)) +
     labs(x = "Km",y = "Position",caption = "@statskier - statisticalskier.com") +
     theme_bw()
 

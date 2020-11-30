@@ -4,21 +4,17 @@
 \alias{open_race_url}
 \title{Open Race URL in Browser}
 \usage{
-open_race_url(raceid)
+open_race_url(eventid)
 }
 \arguments{
-\item{raceid}{integer}
+\item{eventid}{integer}
 }
 \description{
 Open results for a race in a web browser.
 }
 \examples{
 \dontrun{
-open_race_url(raceid = 7902)
+open_race_url(eventid = 7902)
 }
-}
-\seealso{
-Other race info functions: 
-\code{\link{update_race_url}()}
 }
 \concept{race info functions}

@@ -27,11 +27,12 @@ race_snapshot_dst <- function(event_id,
                               title = "",
                               cutoff = 365 * 4,
                               reduced = TRUE){
-
-  cur_race <- tbl(src = conl,"v_distance_maj_int") %>%
+  cur_race <- tbl(src = ..statskier_pg_con..,
+                  dbplyr::in_schema("public","v_distance_maj_int")) %>%
     filter(eventid == event_id) %>%
     arrange(rank) %>%
     collect() %>%
+    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) %>%
     mutate(name1 = paste(shorten_names(name),rank)) %>%
     arrange(rank)
 
@@ -60,11 +61,13 @@ race_snapshot_dst <- function(event_id,
 
   cutoff_date <- as.character(as.Date(race_date) - cutoff)
 
-  race_history <- tbl(src = conl,"v_distance_maj_int") %>%
+  race_history <- tbl(src = ..statskier_pg_con..,
+                      dbplyr::in_schema("public","v_distance_maj_int")) %>%
     filter(compid %in% local(cur_race$compid) &
              date < race_date &
              date >= cutoff_date) %>%
     collect() %>%
+    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) %>%
     left_join(cur_race[,c('name','name1')],by = 'name') %>%
     mutate(same_tech = ifelse(tech == race_tech,'Yes','No'),
            same_format = ifelse(format %in% race_format,'Yes','No')) %>%
@@ -176,11 +179,12 @@ race_snapshot_spr <- function(event_id,
                               title = "",
                               cutoff = 365 * 4,
                               reduced = TRUE){
-
-  cur_race <- tbl(src = conl,"v_sprint_maj_int") %>%
+  cur_race <- tbl(src = ..statskier_pg_con..,
+                  dbplyr::in_schema("public","v_sprint_maj_int")) %>%
     filter(eventid == event_id) %>%
     arrange(rank) %>%
     collect() %>%
+    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) %>%
     mutate(name1 = paste(shorten_names(name),rank)) %>%
     arrange(rank)
 
@@ -196,11 +200,13 @@ race_snapshot_spr <- function(event_id,
 
   cutoff_date <- as.character(as.Date(race_date) - cutoff)
 
-  race_history <- tbl(src = conl,"v_sprint_maj_int") %>%
+  race_history <- tbl(src = ..statskier_pg_con..,
+                      dbplyr::in_schema("public","v_sprint_maj_int")) %>%
     filter(name %in% local(cur_race$name) &
              date < race_date &
              date >= cutoff_date) %>%
     collect() %>%
+    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) %>%
     left_join(cur_race[,c('name','name1')],by = 'name') %>%
     mutate(same_tech = ifelse(tech == race_tech,'Yes','No')) %>%
     group_by(name) %>%

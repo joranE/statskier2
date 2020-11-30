@@ -15,5 +15,5 @@ pts_thresh(x, dates, window = 365L)
 }
 \description{
 Calculate the point threshold at any given point in time at which an athlete
-would be able to lower thair carried FIS points.
+would be able to lower their carried FIS points.
 }

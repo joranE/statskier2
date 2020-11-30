@@ -33,20 +33,22 @@ spr_plot <- function(ath_names,by_tech = FALSE){
     facet <- facet_wrap(~name)
   }
 
-  ath_data <- tbl(src = options()$statskier_src,"main") %>%
-    filter(cat1 %in% MAJ_INT &
-             name %in% ath_names &
-             type == 'Sprint' &
-             season >= '2005-2006') %>%
+  ath_data <- tbl(src = ..statskier_pg_con..,
+                  dbplyr::in_schema("public","v_sprint_maj_int")) %>%
+    filter(name %in% ath_names &
+             season >= '2005-2006' &
+             !is.na(rank)) %>%
     collect() %>%
     mutate(level = cut(rank,
                        breaks = c(-Inf,6,12,30,Inf),
                        labels = c('Final','Semi','Quarter','Qual')),
            tech_long = ifelse(tech == 'F','Freestyle','Classic')) %>%
-    group_by_(.dots = grps) %>%
+    group_by_at(.vars = grps) %>%
     summarise(n_result = n()) %>%
+    ungroup() %>%
     mutate(level = factor(level,
-                          levels = c('Qual','Quarter','Semi','Final')))
+                          levels = c('Qual','Quarter','Semi','Final')),
+           season_abbr = substr(season,6,9))
 
   lower <- filter(ath_data,level == 'Qual')
   upper <- filter(ath_data,level != 'Qual')
@@ -57,20 +59,21 @@ spr_plot <- function(ath_names,by_tech = FALSE){
   p <- ggplot() +
     facet +
     geom_bar(data = lower,
-             aes(x = season,y = -n_result,fill = level),
+             aes(x = season_abbr,y = -n_result,fill = level),
              width = 0.5,
              position = "stack",
              stat = "identity") +
     geom_bar(data = upper,
-             aes(x = season,y = n_result,fill = level,order = level),
+             aes(x = season_abbr,y = n_result,fill = level),
              width = 0.5,
              position = "stack",
              stat = "identity") +
     geom_hline(yintercept = 0,color = "black") +
-    labs(x = NULL,y = "Number of Races",fill = "Max\nround\nreached") +
+    labs(x = "Season",y = "Number of Races",fill = "Max\nround\nreached") +
     scale_y_continuous(labels = abs) +
-    scale_fill_manual(values = RColorBrewer::brewer.pal(6,"Blues")[c(6,3:5)],
+    scale_fill_manual(values = RColorBrewer::brewer.pal(6,"Blues")[6:3],
                       breaks = c('Final','Semi','Quarter','Qual')) +
+    theme_bw() +
     theme(axis.text.x = element_text(hjust = 0,vjust = 1,angle = 310))
 
   return(list(plot = p,

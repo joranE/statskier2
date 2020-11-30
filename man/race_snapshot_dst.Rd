@@ -5,18 +5,18 @@
 \alias{race_snapshot_spr}
 \title{Race Snapshots}
 \usage{
-race_snapshot_dst(race_id, title = "", cutoff = 365 * 4, reduced = TRUE)
+race_snapshot_dst(event_id, title = "", cutoff = 365 * 4, reduced = TRUE)
 
-race_snapshot_spr(race_id, title = "", cutoff = 365 * 4, reduced = TRUE)
+race_snapshot_spr(event_id, title = "", cutoff = 365 * 4, reduced = TRUE)
 }
 \arguments{
-\item{race_id}{integer race id}
-
 \item{title}{race title}
 
 \item{cutoff}{integer number of days in past to gether data from}
 
 \item{reduced}{boolean; if \code{TRUE} only show top 30 plus North Americans}
+
+\item{race_id}{integer race id}
 }
 \value{
 A named list with components:

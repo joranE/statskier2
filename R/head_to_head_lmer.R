@@ -6,7 +6,7 @@
 #' "sophisticated" method.
 #'
 #' @param ath_names character vector of athlete names
-#' @param race_id integer; id of the race to assess performance of
+#' @param event_id integer; id of the race to assess performance of
 #' @param num_opp integer; number of opponents to consider in each race, if `Inf`
 #' use all opponents
 #' @param cutoff integer; size of time window in days to collect prior races from
@@ -19,7 +19,7 @@
 #' @importFrom lme4 lmer
 #' @export
 hth_lmer <- function(ath_names,
-                     race_id,
+                     event_id,
                      num_opp = Inf,
                      cutoff = 365 * 5,
                      min_encounters = 1,
@@ -30,7 +30,8 @@ hth_lmer <- function(ath_names,
   measure <- match.arg(measure)
   events = match.arg(events)
 
-  race_data <- tbl(src = options()$statskier_src,"main") %>%
+  race_data <- tbl(src = ..statskier_pg_con..,
+                   dbplyr::in_schema("public","main")) %>%
     filter(raceid == race_id) %>%
     collect() %>%
     filter(rank <= num_opp | name %in% ath_names)

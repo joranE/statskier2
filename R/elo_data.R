@@ -9,10 +9,11 @@
 #' @export
 dst_elo_data <- function(default_rating = 1300,maj_int = FALSE){
 
-  dst <- tbl(src = options()$statskier_src,"main") %>%
-    filter(type == 'Distance') %>%
-    arrange(date,raceid,rank) %>%
-    collect()
+  dst <- tbl(src = ..statskier_pg_con..,
+             dbplyr::in_schema("public","v_distance")) %>%
+    arrange(date,eventid,rank) %>%
+    collect() %>%
+    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
 
   if (maj_int){
     dst <- dst %>%
@@ -47,10 +48,11 @@ dst_elo_data <- function(default_rating = 1300,maj_int = FALSE){
 #' @export
 spr_elo_data <- function(default_rating = 1300,maj_int = FALSE){
 
-  spr <- tbl(src = options()$statskier_src,"main") %>%
-    filter(type == 'Sprint') %>%
+  spr <- tbl(src = ..statskier_pg_con..,
+             dbplyr::in_schema("public","v_sprint")) %>%
     arrange(date,raceid,rank) %>%
-    collect()
+    collect() %>%
+    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
 
   if (maj_int){
     spr <- spr %>%

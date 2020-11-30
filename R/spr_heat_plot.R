@@ -4,13 +4,15 @@
 #' @export
 spr_heat_plot <- function(.eventid,subtitle = ""){
 
-  race_info <- tbl(conl,"v_sprint_heats") %>%
+  race_info <- tbl(src = ..statskier_pg_con..,
+                   dbplyr::in_schema("public","v_sprint_heats")) %>%
     filter(eventid == .eventid) %>%
     select(eventid,date,season,location,tech,length,gender) %>%
     distinct() %>%
     collect()
 
-  spr_qual <- tbl(conl,"v_sprint") %>%
+  spr_qual <- tbl(src = ..statskier_pg_con..,
+                  dbplyr::in_schema("public","v_sprint")) %>%
     filter(eventid == .eventid) %>%
     collect() %>%
     select(eventid,name,nation,time,rank = rankqual) %>%
@@ -20,19 +22,25 @@ spr_heat_plot <- function(.eventid,subtitle = ""){
                          labels = c("Qual","QF","SF","Final")),
            qf = NA_integer_,
            sf = NA_integer_,
-           fn = NA_integer_)
-  spr_heats <- tbl(conl,"v_sprint_heats") %>%
+           fn = NA_integer_) %>%
+    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
+  spr_heats <- tbl(src = ..statskier_pg_con..,
+                   dbplyr::in_schema("public","v_sprint_heats")) %>%
     filter(eventid == .eventid) %>%
     collect() %>%
-    select(eventid,name,nation,time = heat_time,rank = heat_rank,qf,sf,fn,heat) %>%
+    select(eventid,name,nation,
+           time = heat_time,
+           rank = heat_rank,qf,sf,fn,heat) %>%
     mutate(heat = case_when(substr(heat,1,1) == "1" ~ "quarter",
                             substr(heat,1,1) == "2" ~ "semi",
                             substr(heat,1,1) == "3" ~ "final"),
            heat = factor(heat,
                          levels = c("qual","quarter","semi","final"),
-                         labels = c("Qual","QF","SF","Final")))
+                         labels = c("Qual","QF","SF","Final"))) %>%
+    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
 
-  lls <- tbl(conl,"v_sprint_heats") %>%
+  lls <- tbl(src = ..statskier_pg_con..,
+             dbplyr::in_schema("public","v_sprint_heats")) %>%
     filter(eventid == .eventid) %>%
     collect() %>%
     filter(ll == "Y") %>%
@@ -51,6 +59,23 @@ spr_heat_plot <- function(.eventid,subtitle = ""){
   data_clean <- left_join(data_clean,
                           lls,by = "name") %>%
     mutate(name = coalesce(ll_name,name))
+
+  title <- paste(race_info$date,
+                 race_info$location,
+                 race_info$gender,
+                 paste0(race_info$length,"km"),
+                 race_info$tech)
+
+  data_clean <- data_clean %>%
+    group_by(name) %>%
+    mutate(qual_only = all(heat == "Qual")) %>%
+    ungroup() %>%
+    filter(!qual_only)
+
+  data_clean <- data_clean %>%
+    group_by(heat) %>%
+    mutate(time_med = time - median(time,na.rm = TRUE))
+
   spr_final <- data_clean %>%
     filter(name %in% data_clean$name[data_clean$fn == 1])
   name_lev_ord <- spr_final %>%
@@ -59,20 +84,18 @@ spr_heat_plot <- function(.eventid,subtitle = ""){
     pull(name)
   spr_final$name <- factor(spr_final$name,levels = name_lev_ord)
 
-  title <- paste(race_info$date,race_info$location,race_info$gender,paste0(race_info$length,"km"),race_info$tech)
-
-  data_clean <- data_clean %>%
-    group_by(name) %>%
-    mutate(qual_only = all(heat == "Qual")) %>%
-    ungroup() %>%
-    filter(!qual_only)
-
-  p <- ggplot(data = data_clean,aes(x = heat,y = time,group = name)) +
+  p <- ggplot(data = data_clean,aes(x = heat,y = time_med,group = name)) +
     geom_line(alpha = 0.5) +
-    geom_line(data = spr_final,aes(color = name,group = name),size = 1.1) +
-    geom_text(aes(label = heat_lab),hjust = rep(c(1,0),length.out = nrow(data_clean))) +
+    geom_line(data = spr_final,
+              aes(color = name,group = name),
+              size = 1.1) +
+    geom_text(aes(label = heat_lab),
+              hjust = rep(c(1,0),length.out = nrow(data_clean))) +
     scale_color_brewer(palette = "Set2") +
-    labs(x = "Round",y = "Time (seconds)",color = NULL,caption = "@statskier - statisticalskier.com") +
+    labs(x = "Round",
+         y = "Difference from median time within round",
+         color = NULL,
+         caption = "@statskier - statisticalskier.com") +
     ggtitle(label = title,subtitle = subtitle) +
     theme_bw()
   p

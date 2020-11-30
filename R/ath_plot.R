@@ -19,10 +19,11 @@
 #'    \item \code{ath_data} - raw athlete data
 #'    \item \code{ath_summary} - athlete data summarised by season/technique
 #'  }
+#' @importFrom dbplyr in_schema
 #' @export
 #' @examples
 #' \dontrun{
-#' p <- ath_plot_dst(ath_names = c('DIGGINS Jessica','BJORNSEN Sadie','CALDWELL Sophie'),
+#' p <- ath_plot_dst(ath_names = c('DIGGINS Jessica','MAUBET BJORNSEN Sadie','CALDWELL Sophie'),
 #'                   races = "maj_int")
 #' print(p$plot)
 #' }
@@ -40,14 +41,16 @@ ath_plot_dst <- function(ath_names,
     races <- "maj_int"
   }
 
-  ath_data <- tbl(src = conl,"v_distance") %>%
+  ath_data <- tbl(src = ..statskier_pg_con..,
+                  dbplyr::in_schema("public","v_distance")) %>%
     filter(name %in% ath_names) %>%
     collect() %>%
+    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) %>%
     mutate(tech_name = ifelse(tech == 'C','Classic',
                               ifelse(tech == 'F','Freestyle','Pursuit')))
 
   if (races == "maj_int"){
-    ath_data <- filter(ath_data,cat1 %in% MAJ_INT)
+    ath_data <- filter(ath_data,primary_tag %in% MAJ_INT)
   }
 
   if (!is.null(collapse)){
@@ -141,13 +144,15 @@ ath_plot_spr <- function(ath_names,
     races <- "maj_int"
   }
 
-  ath_data <- tbl(src = conl,"v_sprint") %>%
+  ath_data <- tbl(src = ..statskier_pg_con..,
+                  dbplyr::in_schema("public","v_sprint")) %>%
     filter(name %in% ath_names) %>%
     collect() %>%
+    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) %>%
     mutate(tech_name = ifelse(tech == 'C','Classic','Freestyle'))
 
   if (races == "maj_int"){
-    ath_data <- filter(ath_data,cat1 %in% MAJ_INT)
+    ath_data <- filter(ath_data,primary_tag %in% MAJ_INT)
   }
 
   if (!is.null(collapse)){

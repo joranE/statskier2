@@ -2,21 +2,22 @@
 #'
 #' Open results for a race in a web browser.
 #'
-#' @param raceid integer
+#' @param eventid integer
 #' @export
 #' @family race info functions
 #' @examples
 #' \dontrun{
-#' open_race_url(raceid = 7902)
+#' open_race_url(eventid = 7902)
 #' }
-open_race_url <- function(raceid){
+open_race_url <- function(eventid){
   if (length(raceid) > 1){
     raceid <- raceid[1]
-    warning("Ignoring all but first raceid...",immediate. = TRUE)
+    warning("Ignoring all but first eventid...",immediate. = TRUE)
   }
-  rid <- raceid
-  urls <- tbl(options()$statskier_src,"race_url") %>%
-    filter(raceid == rid) %>%
+  eid <- eventid
+  urls <- tbl(src = ..statskier_pg_con..,
+              dbplyr::in_schema("public","v_event_url")) %>%
+    filter(eventid == eid) %>%
     collect()
   if (nrow(urls) == 0){
     stop("No URLs for that raceid yet.")

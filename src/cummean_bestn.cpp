@@ -110,7 +110,7 @@ NumericVector ptsThresh(NumericVector values,NumericVector endDates,int window){
       out[i] = (1.5 / 4.0) * sum(valuesWindow);
     }
     if (lenCur >= 5){
-      std::nth_element(valuesWindow.begin(),valuesWindow.begin() + 5,valuesWindow.end());
+      std::nth_element(valuesWindow.begin(),valuesWindow.begin() + 4,valuesWindow.end());
       out[i] = valuesWindow[4];
     }
   }

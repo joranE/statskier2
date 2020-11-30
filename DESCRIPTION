@@ -5,7 +5,7 @@ Version: 0.1
 Imports: 
     DBI,
     RSQLite,
-    RMySQL,
+    RPostgres,
     dplyr,
     stringr,
     ggplot2,
@@ -20,7 +20,8 @@ Maintainer: Joran Elias <statisticalskier@gmail.com>
 Description: Complete rewrite of functions and tools for Statistcal Skier
 License: GPL
 LazyData: TRUE
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
+Encoding: UTF-8
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr

@@ -1,33 +1,38 @@
-#' Manually Create Database Connections
+#' Create Connection to StatSkier DB
 #'
-#' Use these functions to manually create connections to
-#' either a local SQLite database or a remote MySQL database.
+#' Call this function with no arguments to create a hidden object in the
+#' global environment that acts as the db connection. This function expects
+#' all the connection information to be stored in `options()$statskier_pg` as
+#' a list with elements host, dbname, user, password, port and sslmode.
 #'
-#' They look for connection information in `options("sqlite_path")` and
-#' `options("mysql")`.
+#' The hidden db connection object is called \code{..statskier_pg_con..}.
 #'
-#' These connections can then be passed to \code{\link{ss_query}}
-#' when performing arbitrary SQL queries on the data.
 #' @return A database connection object
 #' @export
-#' @import RSQLite
-#' @examples
-#' \dontrun{
-#' conl <- db_xc_local()
-#' ss_query(conl,"select * from main where name = 'RANDALL Kikkan' limit 3")
-#' }
-db_xc_local <- function(){
-  dbConnect(RSQLite::SQLite(), options()$sqlite_path)
+#' @import RPostgres
+statskier_connect <- function(){
+  con_info <- options()$statskier_pg
+  if (!is.null(con_info)){
+    con <- RPostgres::dbConnect(RPostgres::Postgres(),
+                                host = con_info$host,
+                                dbname = con_info$dbname,
+                                user = con_info$user,
+                                password = con_info$password,
+                                port = con_info$port,
+                                sslmode = con_info$sslmode)
+    assign(x = "..statskier_pg_con..",value = con,envir = .GlobalEnv)
+    message("Connected to statskier db.")
+  }else{
+    message("Connection info not found in options('statskier_pg').")
+  }
 }
 
-#' @rdname db_xc_local
 #' @export
-#' @import RMySQL
-db_xc_remote <- function(){
-  dbConnect(drv = RMySQL::MySQL(),
-            dbname = options()$mysql$dbName,
-            username = options()$mysql$user,
-            password = options()$mysql$password,
-            host = options()$mysql$host,
-            port = options()$mysql$port)
+statskier_disconnect <- function(){
+  if (!exists(x = "..statskier_pg_con..",envir = .GlobalEnv)){
+    stop("Connection object ..statskier_pg_con.. not found.")
+  } else {
+    RPostgres::dbDisconnect(..statskier_pg_con..)
+    message("Disonnected from statskier db.")
+  }
 }

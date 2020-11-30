@@ -4,12 +4,12 @@
 \alias{wjc_u23_plot}
 \title{WJC & U23 History Plots}
 \usage{
-wjc_u23_plot(nations, races = c("WJC", "U23"))
+wjc_u23_plot(nations, races = c("wjc", "wu23"))
 }
 \arguments{
 \item{nations}{character vector of nation codes, eg "USA", "CAN", etc.}
 
-\item{races}{character; one of "WJC" or "U23"}
+\item{races}{character; one of "wjc" or "wu23"}
 }
 \value{
 A named list with components:
@@ -24,7 +24,7 @@ U23s, by gender and race type.
 }
 \examples{
 \dontrun{
-p <- wjc_u23_plot(nations = c('USA','CAN'),races = 'WJC')
+p <- wjc_u23_plot(nations = c('USA','CAN'),races = 'wjc')
 print(p$plots$USA)
 print(p$plots$CAN)
 }
