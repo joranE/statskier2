@@ -2,11 +2,13 @@
 #' @export
 dev_cohort_dst_qgam <- function(top_k = 10,
                                 times = 3,
+                                age = 30,
                                 q = c(0.1,0.9),
                                 type = "fispoints"){
   dst_sql <- statskier2::read_sql("inst/sql/cohort_dst.sql")
   dst_sql <- glue::glue_sql(dst_sql,
                             rnk = top_k,
+                            age = age,
                             topn = times,
                             .con = ..statskier_pg_con..)
   message("Fetching data...")
@@ -88,11 +90,13 @@ dev_cohort_dst_qgam <- function(top_k = 10,
 #' @export
 dev_cohort_spr_qgam <- function(top_k = 12,
                                 times = 3,
+                                age = 30,
                                 q = c(0.1,0.9),
                                 type = "fispoints"){
-  spr_sql <- squr::read_sql("inst/sql/cohort_spr.sql")
+  spr_sql <- read_sql("inst/sql/cohort_spr.sql")
   spr_sql <- glue::glue_sql(spr_sql,
                             rnk = top_k,
+                            age = age,
                             topn = times,
                             .con = ..statskier_pg_con..)
   spr_result <- RPostgres::dbGetQuery(..statskier_pg_con..,spr_sql)
@@ -103,10 +107,31 @@ dev_cohort_spr_qgam <- function(top_k = 12,
   if (type == "fispoints"){
     spr_result <- spr_result %>%
       filter(!is.na(fispoints) & !is.na(age))
-    spr_mod <- qgam::mqgam(form = fispoints ~ s(age,by = gender),
-                           data = spr_result,
-                           qu = q,
-                           lsig = c(2.42,3.00))
+    spr_result_men <- filter(spr_result,gender == "Men")
+    spr_result_wom <- filter(spr_result,gender == "Women")
+    tuning_data_men <- spr_result_men %>%
+      slice_sample(prop = 0.1)
+    tuning_data_wom <- spr_result_wom %>%
+      slice_sample(prop = 0.1)
+    message("Estimating lsig...")
+    tune_lsig_men <- qgam::tuneLearnFast(form = fispoints ~ s(age),
+                                         data = tuning_data_men,
+                                         qu = q,
+                                         control = list(progress = FALSE))
+    tune_lsig_wom <- qgam::tuneLearnFast(form = fispoints ~ s(age),
+                                         data = tuning_data_wom,
+                                         qu = q,
+                                         control = list(progress = FALSE))
+
+    message("Fitting full model...")
+    spr_mod_men <- qgam::mqgam(form = fispoints ~ s(age),
+                               data = spr_result_men,
+                               qu = q,
+                               lsig = tune_lsig_men$lsig)
+    spr_mod_wom <- qgam::mqgam(form = fispoints ~ s(age),
+                               data = spr_result_wom,
+                               qu = q,
+                               lsig = tune_lsig_wom$lsig)
   }
   if (type == "pbm_pts"){
     spr_result <- spr_result %>%
@@ -118,11 +143,25 @@ dev_cohort_spr_qgam <- function(top_k = 12,
   }
 
 
-  new_data_spr <- tidyr::crossing(gender = c("Men","Women"),age = seq(18,45,by = 0.5))
-  new_data_spr$q_upper <- qgam::qdo(spr_mod,qu = q[2],predict,newdata = new_data_spr)
-  new_data_spr$q_lower <- qgam::qdo(spr_mod,qu = q[1],predict,newdata = new_data_spr)
+  new_data_spr_men <- data.frame(age = seq(18,45,by = 0.5),
+                                 gender = "Men")
+  new_data_spr_wom <- data.frame(age = seq(18,45,by = 0.5),
+                                 gender = "Women")
+  new_data_spr_men$q_upper <- qgam::qdo(spr_mod_men,qu = q[2],
+                                        predict,
+                                        newdata = new_data_spr_men)
+  new_data_spr_men$q_lower <- qgam::qdo(spr_mod_men,qu = q[1],
+                                        predict,
+                                        newdata = new_data_spr_men)
 
-  new_data_spr
+  new_data_spr_wom$q_upper <- qgam::qdo(spr_mod_wom,qu = q[2],
+                                        predict,
+                                        newdata = new_data_spr_wom)
+  new_data_spr_wom$q_lower <- qgam::qdo(spr_mod_wom,qu = q[1],
+                                        predict,
+                                        newdata = new_data_spr_wom)
+
+  bind_rows(new_data_spr_men,new_data_spr_wom)
 }
 
 #' @export
@@ -131,7 +170,7 @@ dev_cohort_dst <- function(ath_fisid,
                            type = "fispoints",
                            .label = "Development Trends",
                            .subtitle = ""){
-  ath_res <- skier_results(.fisid = ath_fisid)
+  ath_res <- skier_results(fisid = ath_fisid)
 
   ath_res$dst <- ath_res$dst %>%
     mutate(fisid_fac = factor(fisid,levels = ath_fisid)) %>%
@@ -176,7 +215,7 @@ dev_cohort_spr <- function(ath_fisid,
                            type = "fispoints",
                            .label = "Development Trends",
                            .subtitle = ""){
-  ath_res <- skier_results(.fisid = ath_fisid)
+  ath_res <- skier_results(fisid = ath_fisid)
 
   ath_res$spr <- ath_res$spr %>%
     mutate(fisid_fac = factor(fisid,levels = ath_fisid)) %>%
