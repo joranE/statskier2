@@ -4,7 +4,7 @@
 \alias{spr_heat_plot}
 \title{Sprint Heat Round Plot}
 \usage{
-spr_heat_plot(.eventid, subtitle = "")
+spr_heat_plot(.eventid, subtitle = "", time_scale = "median", clip = NULL)
 }
 \description{
 Sprint Heat Round Plot

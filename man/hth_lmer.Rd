@@ -6,7 +6,7 @@
 \usage{
 hth_lmer(
   ath_names,
-  race_id,
+  event_id,
   num_opp = Inf,
   cutoff = 365 * 5,
   min_encounters = 1,
@@ -19,7 +19,7 @@ hth_lmer(
 \arguments{
 \item{ath_names}{character vector of athlete names}
 
-\item{race_id}{integer; id of the race to assess performance of}
+\item{event_id}{integer; id of the race to assess performance of}
 
 \item{num_opp}{integer; number of opponents to consider in each race, if `Inf`
 use all opponents}
