@@ -2,7 +2,7 @@
 #'
 #' @importFrom egg ggarrange
 #' @export
-dst_split_plot <- function(.eventid,n_skiers = 30,n_seg = 6){
+dst_split_plot <- function(.eventid,n_skiers = 30,n_seg = 6,labels = TRUE,omit_splits = NULL,ref_split = 1){
 
   race_info <- tbl(src = ..statskier_pg_con..,
                    dbplyr::in_schema("public","v_distance_splits")) %>%
@@ -10,6 +10,16 @@ dst_split_plot <- function(.eventid,n_skiers = 30,n_seg = 6){
     select(eventid,date,season,location,tech,length,gender,format) %>%
     distinct() %>%
     collect()
+
+  if (ref_split == 1){
+    ref_split_fun <- function(x,na.rm = TRUE,ref_split){
+      min(x,na.rm = na.rm)
+    }
+  } else{
+    ref_split_fun <- function(x,na.rm = TRUE,ref_split){
+      sort(x,decreasing = FALSE,na.last = na.rm)[ref_split]
+    }
+  }
 
   title <- paste(race_info$date,race_info$location,race_info$gender,
                  paste0(race_info$length,"km"),race_info$tech,race_info$format)
@@ -19,15 +29,19 @@ dst_split_plot <- function(.eventid,n_skiers = 30,n_seg = 6){
     filter(eventid == .eventid & !is.na(split_km)) %>%
     collect() %>%
     group_by(split_km) %>%
-    mutate(time_back = split_time - min(split_time,na.rm = TRUE),
-           pct_back = time_back / min(split_time,na.rm = TRUE),
+    mutate(time_back = split_time - ref_split_fun(split_time,na.rm = TRUE,ref_split),
+           pct_back = time_back / ref_split_fun(split_time,na.rm = TRUE,ref_split),
            name = stringr::str_trim(name,side = "both")) %>%
-    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) %>%
     ungroup()
 
   if (race_info$format == "Pursuit"){
     dst_race <- dst_race %>%
       filter(split_km != min(split_km,na.rm = TRUE))
+  }
+
+  if (!is.null(omit_splits)){
+    dst_race <- dst_race %>%
+      filter(split_km %ni% omit_splits)
   }
 
   top_end <- dst_race %>%
@@ -47,18 +61,23 @@ dst_split_plot <- function(.eventid,n_skiers = 30,n_seg = 6){
     as.data.frame() %>%
     filter(seg_rank <= n_seg)
 
-  subt <- "Only shows top %s finishers.\nRed numbers indicate %s fastest splits over that section (may not be a person in the top %s)."
-  subt <- sprintf(subt,n_skiers,n_seg,n_skiers)
+  subt <- NULL
 
   p_top <- dst_race %>%
     filter(name %in% top_end$name) %>%
     mutate(facet_label = "Percent Back by Split") %>%
     ggplot(data = .,aes(x = split_km,y = pct_back,group = name)) +
     facet_wrap(~facet_label) +
-    geom_line(alpha = 0.5) +
-    geom_text(data = top_begin,aes(label = name2),hjust = 1.1,size = 2,color = "blue") +
-    geom_text(data = top_end,aes(label = name2),hjust = -0.1,size = 2,color = "blue") +
-    geom_text(data = top_seg,aes(label = seg_rank),size = 2.5,color = "red") +
+    geom_line(alpha = 0.5)
+  if (labels){
+    p_top <- p_top +
+      geom_text(data = top_begin,aes(label = name2),hjust = 1.1,size = 2,color = "blue") +
+      geom_text(data = top_end,aes(label = name2),hjust = -0.1,size = 2,color = "blue") +
+      geom_text(data = top_seg,aes(label = seg_rank),size = 2.5,color = "red")
+    subt <- "Only shows top %s finishers.\nRed numbers indicate %s fastest splits over that section (may not be a person in the top %s)."
+    subt <- sprintf(subt,n_skiers,n_seg,n_skiers)
+  }
+  p_top <- p_top +
     scale_x_continuous(breaks = unique(dst_race$split_km),expand = expansion(mult = 0.1)) +
     scale_y_continuous(labels = scales::percent) +
     labs(x = NULL,y = "Percent Back") +
@@ -71,14 +90,18 @@ dst_split_plot <- function(.eventid,n_skiers = 30,n_seg = 6){
     mutate(facet_label = "Race Position by Split") %>%
     ggplot(data = .,aes(x = split_km,y = split_rank,group = name)) +
     facet_wrap(~facet_label) +
-    geom_line(alpha = 0.5) +
-    geom_text(data = top_begin,aes(label = name2),hjust = 1.1,size = 2,color = "blue") +
-    geom_text(data = top_end,aes(label = name2),hjust = -0.1,size = 2,color = "blue") +
-    geom_text(data = top_seg,aes(label = seg_rank),size = 2.5,color = "red") +
+    geom_line(alpha = 0.5)
+  if (labels){
+    p_bottom <- p_bottom +
+      geom_text(data = top_begin,aes(label = name2),hjust = 1.1,size = 2,color = "blue") +
+      geom_text(data = top_end,aes(label = name2),hjust = -0.1,size = 2,color = "blue") +
+      geom_text(data = top_seg,aes(label = seg_rank),size = 2.5,color = "red")
+  }
+  p_bottom <- p_bottom +
     scale_x_continuous(breaks = unique(dst_race$split_km),expand = expansion(mult = 0.1)) +
     labs(x = "Km",y = "Position",caption = "@statskier - statisticalskier.com") +
     theme_bw()
 
   final_plot <- egg::ggarrange(p_top,p_bottom,nrow = 2,draw = FALSE)
-  return(final_plot)
+  return(list(final_plot = final_plot,top = p_top,bottom = p_bottom,data = dst_race))
 }
