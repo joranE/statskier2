@@ -18,14 +18,12 @@
 #' print(p$plots$CAN)
 #' }
 wjc_u23_plot <- function(nations,races = c('wjc','wu23')){
-  conl <- db_xc_remote(); on.exit(RPostgres::dbDisconnect(conl))
-
   races <- match.arg(races)
-  dst <- tbl(conl,dbplyr::in_schema("public","v_distance")) %>%
+  dst <- tbl(..statskier_pg_con..,dbplyr::in_schema("public","v_distance")) %>%
     filter(primary_tag == races &
              nation %in% nations) %>%
     collect()
-  spr <- tbl(conl,dbplyr::in_schema("public","v_sprint")) %>%
+  spr <- tbl(..statskier_pg_con..,dbplyr::in_schema("public","v_sprint")) %>%
     filter(primary_tag == races &
              nation %in% nations) %>%
     collect()
