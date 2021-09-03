@@ -19,7 +19,8 @@ statskier_connect <- function(){
                                 user = con_info$user,
                                 password = con_info$password,
                                 port = con_info$port,
-                                sslmode = con_info$sslmode)
+                                sslmode = con_info$sslmode,
+                                bigint = "integer")
     assign(x = "..statskier_pg_con..",value = con,envir = .GlobalEnv)
     message("Connected to statskier db.")
   }else{
