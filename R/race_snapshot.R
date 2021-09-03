@@ -26,7 +26,9 @@
 race_snapshot_dst <- function(event_id,
                               title = "",
                               cutoff = 365 * 4,
-                              reduced = TRUE){
+                              reduced = TRUE,
+                              method = "pbm",
+                              adj_pbm_pts = FALSE){
   cur_race <- tbl(src = ..statskier_pg_con..,
                   dbplyr::in_schema("public","v_distance_maj_int")) %>%
     filter(eventid == event_id) %>%
@@ -35,6 +37,7 @@ race_snapshot_dst <- function(event_id,
     mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) %>%
     mutate(name1 = paste(shorten_names(name),rank)) %>%
     arrange(rank)
+  full_race <- cur_race
 
   if (reduced){
     cur_race <- filter(cur_race,rank <= 30 | nation %in% c('USA','CAN'))
@@ -67,7 +70,6 @@ race_snapshot_dst <- function(event_id,
              date < race_date &
              date >= cutoff_date) %>%
     collect() %>%
-    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) %>%
     left_join(cur_race[,c('name','name1')],by = 'name') %>%
     mutate(same_tech = ifelse(tech == race_tech,'Yes','No'),
            same_format = ifelse(format %in% race_format,'Yes','No')) %>%
@@ -92,21 +94,41 @@ race_snapshot_dst <- function(event_id,
                                 c('Overall',tech_label,format_label)),
                        .id = 'facet_grp')
 
-  ath_bars_overall <- race_history %>%
-    filter(nrace_overall >= 10) %>%
-    group_by(name1) %>%
-    summarise(q25 = quantile(pbm,0.25,na.rm = TRUE),
-              q75 = quantile(pbm,0.75,na.rm = TRUE))
-  ath_bars_tech <- race_history %>%
-    filter(same_tech == 'Yes' & nrace_tech >= 10) %>%
-    group_by(name1) %>%
-    summarise(q25 = quantile(pbm,0.25,na.rm = TRUE),
-              q75 = quantile(pbm,0.75,na.rm = TRUE))
-  ath_bars_format <- race_history %>%
-    filter(same_format == 'Yes' & nrace_format >= 10) %>%
-    group_by(name1) %>%
-    summarise(q25 = quantile(pbm,0.25,na.rm = TRUE),
-              q75 = quantile(pbm,0.75,na.rm = TRUE))
+  if (method == "pbm"){
+    ath_bars_overall <- race_history %>%
+      filter(nrace_overall >= 10) %>%
+      group_by(name1) %>%
+      summarise(q25 = quantile(pbm,0.25,na.rm = TRUE),
+                q75 = quantile(pbm,0.75,na.rm = TRUE))
+    ath_bars_tech <- race_history %>%
+      filter(same_tech == 'Yes' & nrace_tech >= 10) %>%
+      group_by(name1) %>%
+      summarise(q25 = quantile(pbm,0.25,na.rm = TRUE),
+                q75 = quantile(pbm,0.75,na.rm = TRUE))
+    ath_bars_format <- race_history %>%
+      filter(same_format == 'Yes' & nrace_format >= 10) %>%
+      group_by(name1) %>%
+      summarise(q25 = quantile(pbm,0.25,na.rm = TRUE),
+                q75 = quantile(pbm,0.75,na.rm = TRUE))
+  }
+  if (method == "pbm_pts"){
+    ath_bars_overall <- race_history %>%
+      filter(nrace_overall >= 10) %>%
+      group_by(name1) %>%
+      summarise(q25 = quantile(pbm_pts,0.25,na.rm = TRUE),
+                q75 = quantile(pbm_pts,0.75,na.rm = TRUE))
+    ath_bars_tech <- race_history %>%
+      filter(same_tech == 'Yes' & nrace_tech >= 10) %>%
+      group_by(name1) %>%
+      summarise(q25 = quantile(pbm_pts,0.25,na.rm = TRUE),
+                q75 = quantile(pbm_pts,0.75,na.rm = TRUE))
+    ath_bars_format <- race_history %>%
+      filter(same_format == 'Yes' & nrace_format >= 10) %>%
+      group_by(name1) %>%
+      summarise(q25 = quantile(pbm_pts,0.25,na.rm = TRUE),
+                q75 = quantile(pbm_pts,0.75,na.rm = TRUE))
+  }
+
   ath_bars <- bind_rows(setNames(list(ath_bars_overall,ath_bars_tech,ath_bars_format),
                                  c('Overall',tech_label,format_label)),
                         .id = 'facet_grp')
@@ -149,21 +171,44 @@ race_snapshot_dst <- function(event_id,
   block$facet_grp <- factor(block$facet_grp,
                             levels = c(tech_label,format_label,"Overall"))
 
+  if (method == "pbm"){
+    blank_layer <- geom_blank(data = cur_race,aes(x = pbm,y = name1))
+    point_layer1 <- geom_point(data = cur_race,aes(x = pbm,y = name1),color = "red")
+    point_layer2 <- geom_point(data = ath_min,aes(x = pbm,y = name1),alpha = 0.5)
+    x_lab <- "Raw % Behind Median Skier"
+  }
+  if (method == "pbm_pts"){
+    x_lab <- "PBM Points"
+    blank_layer <- geom_blank(data = cur_race,aes(x = pbm_pts,y = name1))
+    if (adj_pbm_pts){
+      fiscrape::fiscrape_connect()
+      adj_pen <- fiscrape::dst_race_penalty(result_data = full_race,event_date = race_date)
+      point_layer1 <- geom_point(data = cur_race,aes(x = pbm_pts + adj_pen,y = name1),color = "red")
+      x_lab <- "Adjusted PBM Points"
+    }else {
+      point_layer1 <- geom_point(data = cur_race,aes(x = pbm_pts,y = name1),color = "red")
+    }
+    point_layer2 <- geom_point(data = ath_min,aes(x = pbm_pts,y = name1),alpha = 0.5)
+  }
+
   p <- ggplot() +
     facet_wrap(~facet_grp,nrow = 1,scale = "free_x") +
-    geom_blank(data = cur_race,aes(x = pbm,y = name1)) +
+    blank_layer +
     geom_rect(data = block,
               aes(ymin = ymn,ymax = ymx,
                   xmin = -Inf,xmax = Inf,
                   fill = block),alpha = 0.25,show.legend = FALSE) +
-    geom_segment(data = ath_bars,aes(x = q25,xend = q75,y = name1,yend = name1)) +
-    geom_point(data = cur_race,aes(x = pbm,y = name1),color = "red") +
-    geom_point(data = ath_min,aes(x = pbm,y = name1),alpha = 0.5) +
+    geom_segment(data = ath_bars,
+                 aes(x = q25,xend = q75,y = name1,yend = name1)) +
+    point_layer1 +
+    point_layer2 +
     scale_fill_manual(values = c('#778899','#2F4F4F')) +
     ggtitle(label = paste("Race Snapshot - ",title),
             subtitle = "For >=10 prior races, bars represent 25th-75th percentile of past performance") +
-    labs(x = '% Behind Median Skier',y = 'Athlete',
-         fill = "",caption = "statisticalskier.com - @statskier") +
+    labs(x = x_lab,
+         y = 'Athlete',
+         fill = "",
+         caption = "statisticalskier.com - @statskier") +
     theme_bw()
 
   return(list(plot = p,
