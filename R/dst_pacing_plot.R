@@ -1,7 +1,8 @@
 #' @export
 dst_pacing_plot <- function(.eventid,
                             .subset,
-                            n_laps,
+                            n_laps = NULL,
+                            omit_splits = NULL,
                             title_text = "",
                             subtitle_text = "Percent behind the fastest time on the preceding lap segment",
                             x_axis_lab = "Lap Split Point",
@@ -9,6 +10,12 @@ dst_pacing_plot <- function(.eventid,
                             .measure = "percent_back",
                             collapse_short_seg = FALSE,
                             skip_first_split = FALSE){
+
+  if (n_laps <= 8){
+    cs <- scale_color_brewer(palette = "Set2")
+  } else {
+    cs <- NULL
+  }
 
   .measure <- match.arg(arg = .measure,
                         choices = c("time_back","percent_back","time_back_km"))
@@ -25,8 +32,12 @@ dst_pacing_plot <- function(.eventid,
                 dbplyr::in_schema("public","v_distance_splits")) %>%
     filter(eventid == .eventid & !is.na(split_km)) %>%
     collect() %>%
-    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) %>%
     select(eventid,compid,name,nation,split_km,split_rank,split_time)
+
+  if (!is.null(omit_splits)){
+    splits <- splits %>%
+      filter(split_km %ni% omit_splits)
+  }
 
   #How many split time points are there?
   n_splits <- n_distinct(splits$split_km)
@@ -38,6 +49,7 @@ dst_pacing_plot <- function(.eventid,
            seg_len = c(split_km[1],diff(split_km)),
            seg_time = c(split_time[1],diff(split_time)))
 
+
   if (collapse_short_seg){
     splits <- splits %>%
       mutate(too_short = lead(seg_len < 0.4,1)) %>%
@@ -46,14 +58,13 @@ dst_pacing_plot <- function(.eventid,
 
     #How many split time points are there?
     n_splits <- n_distinct(splits$split_km)
+
     splits <- splits %>%
       group_by(compid) %>%
       arrange(compid,split_km) %>%
-      mutate(lap = rep(seq_len(n_laps),each = n_splits / n_laps,length.out = n()),
+      mutate(lap = rep(seq_len(n_laps),each = ceiling(n_splits / n_laps),length.out = n()),
              seg_len = c(split_km[1],diff(split_km)),
-             seg_time = c(split_time[1],diff(split_time))) %>%
-      select(-too_short)
-    #browser()
+             seg_time = c(split_time[1],diff(split_time)))
   }
 
   #Calculate laps, segments
@@ -67,6 +78,8 @@ dst_pacing_plot <- function(.eventid,
     as.data.frame() %>%
     mutate(seg_tb_km = seg_tb / seg_len)
 
+
+
   #Official race results & focus subset
   fin_results <- tbl(src = ..statskier_pg_con..,
                      dbplyr::in_schema("public","v_distance")) %>%
@@ -79,10 +92,12 @@ dst_pacing_plot <- function(.eventid,
     select(eventid,compid,rank)
 
   #Construct x axis tick mark labels out of split_km
+
   x_labs <- paste0(sort(unique(splits$split_km)),"k")
   n <- length(x_labs) / n_laps
   x_labs <- split(x_labs,rep(seq_len(n),times = n_laps))
   x_labs <- mapply(FUN = paste,x_labs,MoreArgs = list(collapse = "\n"))
+
 
   #Grab subset and graph
   m1 <- inner_join(splits,
@@ -95,13 +110,13 @@ dst_pacing_plot <- function(.eventid,
   }
 
   p <- ggplot(data = m1,
-           aes(x = lap_pt,y = !!y_var,color = factor(lap),group = lap)) +
+              aes(x = lap_pt,y = !!y_var,color = factor(lap),group = lap)) +
     facet_wrap(~name) +
     geom_point() +
     geom_line() +
     scale_x_continuous(breaks = seq_along(x_labs),labels = x_labs) +
     y_scale +
-    scale_color_brewer(palette = "Set2") +
+    cs +
     labs(x = x_axis_lab,
          y = y_axis_lab,
          color = "Lap",
