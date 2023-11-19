@@ -4,7 +4,14 @@
 \alias{dst_split_plot}
 \title{Distance Split Times Plot}
 \usage{
-dst_split_plot(.eventid, n_skiers = 30, n_seg = 6)
+dst_split_plot(
+  .eventid,
+  n_skiers = 30,
+  n_seg = 6,
+  labels = TRUE,
+  omit_splits = NULL,
+  ref_split = 1
+)
 }
 \description{
 Distance Split Times Plot

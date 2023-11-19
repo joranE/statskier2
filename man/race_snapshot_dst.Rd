@@ -5,7 +5,14 @@
 \alias{race_snapshot_spr}
 \title{Race Snapshots}
 \usage{
-race_snapshot_dst(event_id, title = "", cutoff = 365 * 4, reduced = TRUE)
+race_snapshot_dst(
+  event_id,
+  title = "",
+  cutoff = 365 * 4,
+  reduced = TRUE,
+  method = "pbm",
+  adj_pbm_pts = FALSE
+)
 
 race_snapshot_spr(event_id, title = "", cutoff = 365 * 4, reduced = TRUE)
 }
