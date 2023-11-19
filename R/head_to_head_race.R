@@ -32,23 +32,23 @@ hth_race <- function(ath_names,
   events = match.arg(events)
 
   race_data <- tbl(src = ..statskier_pg_con..,
-                   dbplyr::in_schema("public","main")) %>%
-    filter(raceid == race_id) %>%
-    collect() %>%
+                   dbplyr::in_schema("public","main")) |>
+    filter(raceid == race_id) |>
+    collect() |>
     filter(rank <= num_opp | name %in% ath_names)
 
-  opp_names <- race_data %>%
-    filter(!name %in% ath_names) %>%
+  opp_names <- race_data |>
+    filter(!name %in% ath_names) |>
     pull(var = "name")
 
-  race_info <- race_data %>%
-    select(raceid,date,type,tech,start,length) %>%
+  race_info <- race_data |>
+    select(raceid,date,type,tech,start,length) |>
     distinct()
 
   race_day <- as.integer(as.Date(race_info$date))
 
   hth_df <- hth_data(athletes = ath_names,
-                     opponents = opp_names) %>%
+                     opponents = opp_names) |>
     filter(n_races >= min_encounters &
              race_day - as.integer(as.Date(date)) <= cutoff &
              type == race_info$type)
@@ -64,31 +64,31 @@ hth_race <- function(ath_names,
                  'pb' = 'Percent Back')
 
   #Extract computed data frame from violin plot
-  tmp_plot <- hth_df %>%
-    filter(raceid != race_id) %>%
+  tmp_plot <- hth_df |>
+    filter(raceid != race_id) |>
     ggplot(data = .,aes(x = factor(season),y = y)) +
       facet_wrap(~ath_name) +
       geom_violin()
-  tmp_plot_data <- ggplot2::ggplot_build(tmp_plot)$data[[1]] %>%
+  tmp_plot_data <- ggplot2::ggplot_build(tmp_plot)$data[[1]] |>
     mutate(facet_var = ath_names[PANEL])
 
   #Adjust to make suitable for geom_polygon
-  tmp_plot_data <- tmp_plot_data %>%
+  tmp_plot_data <- tmp_plot_data |>
     mutate(xminv = x - violinwidth * (x - xmin),
            xmaxv = x + violinwidth * (xmax - x))
-  copy1 <- tmp_plot_data %>%
-    mutate(x = xminv) %>%
+  copy1 <- tmp_plot_data |>
+    mutate(x = xminv) |>
     arrange(y)
-  copy2 <- tmp_plot_data %>%
-    mutate(x = xmaxv) %>%
+  copy2 <- tmp_plot_data |>
+    mutate(x = xmaxv) |>
     arrange(-y)
-  polygon_data <- bind_rows(copy1,copy2) %>%
+  polygon_data <- bind_rows(copy1,copy2) |>
     mutate(group1 = interaction(factor(group),factor(y >= 0)),
            fill_group = if_else(y >= 0,'Athlete Wins','Opponent Wins'))
 
-  cur_race <- hth_df %>%
+  cur_race <- hth_df |>
     mutate(season = as.integer(factor(season)),
-           facet_var = ath_name) %>%
+           facet_var = ath_name) |>
     filter(raceid == race_id)
 
   x_labs <- factor(unique(hth_df$season))

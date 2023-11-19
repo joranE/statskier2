@@ -5,17 +5,17 @@
 spr_heat_plot <- function(.eventid,subtitle = "",time_scale = "median",clip = NULL){
 
   race_info <- tbl(src = ..statskier_pg_con..,
-                   dbplyr::in_schema("public","v_sprint_heats")) %>%
-    filter(eventid == .eventid) %>%
-    select(eventid,date,season,location,tech,length,gender) %>%
-    distinct() %>%
+                   dbplyr::in_schema("public","v_sprint_heats")) |>
+    filter(eventid == .eventid) |>
+    select(eventid,date,season,location,tech,length,gender) |>
+    distinct() |>
     collect()
 
   spr_qual <- tbl(src = ..statskier_pg_con..,
-                  dbplyr::in_schema("public","v_sprint")) %>%
-    filter(eventid == .eventid) %>%
-    collect() %>%
-    select(eventid,name,nation,time,rank = rankqual) %>%
+                  dbplyr::in_schema("public","v_sprint")) |>
+    filter(eventid == .eventid) |>
+    collect() |>
+    select(eventid,name,nation,time,rank = rankqual) |>
     mutate(heat = "qual",
            heat = factor(heat,
                          levels = c("qual","quarter","semi","final"),
@@ -24,12 +24,12 @@ spr_heat_plot <- function(.eventid,subtitle = "",time_scale = "median",clip = NU
            sf = NA_integer_,
            fn = NA_integer_)
   spr_heats <- tbl(src = ..statskier_pg_con..,
-                   dbplyr::in_schema("public","v_sprint_heats")) %>%
-    filter(eventid == .eventid) %>%
-    collect() %>%
+                   dbplyr::in_schema("public","v_sprint_heats")) |>
+    filter(eventid == .eventid) |>
+    collect() |>
     select(eventid,name,nation,
            time = heat_time,
-           rank = heat_rank,qf,sf,fn,heat,ll) %>%
+           rank = heat_rank,qf,sf,fn,heat,ll) |>
     mutate(heat = case_when(substr(heat,1,1) == "1" ~ "quarter",
                             substr(heat,1,1) == "2" ~ "semi",
                             substr(heat,1,1) == "3" ~ "final"),
@@ -38,24 +38,24 @@ spr_heat_plot <- function(.eventid,subtitle = "",time_scale = "median",clip = NU
                          labels = c("Qual","QF","SF","Final")))
 
   lls <- tbl(src = ..statskier_pg_con..,
-             dbplyr::in_schema("public","v_sprint_heats")) %>%
-    filter(eventid == .eventid) %>%
-    collect() %>%
-    filter(ll == "Y") %>%
-    select(name,qf,sf) %>%
-    tidyr::pivot_longer(cols = c("qf","sf"),names_to = "heat") %>%
-    filter(!is.na(value)) %>%
-    mutate(heat = toupper(heat)) %>%
-    group_by(name) %>%
-    summarise(ll_heat = paste(heat,collapse = ",")) %>%
-    mutate(ll_name = paste(name,paste0("(LL: ",ll_heat,")"))) %>%
+             dbplyr::in_schema("public","v_sprint_heats")) |>
+    filter(eventid == .eventid) |>
+    collect() |>
+    filter(ll == "Y") |>
+    select(name,qf,sf) |>
+    tidyr::pivot_longer(cols = c("qf","sf"),names_to = "heat") |>
+    filter(!is.na(value)) |>
+    mutate(heat = toupper(heat)) |>
+    group_by(name) |>
+    summarise(ll_heat = paste(heat,collapse = ",")) |>
+    mutate(ll_name = paste(name,paste0("(LL: ",ll_heat,")"))) |>
     select(name,ll_name)
 
-  data_clean <- bind_rows(spr_qual,spr_heats) %>%
+  data_clean <- bind_rows(spr_qual,spr_heats) |>
     mutate(heat_lab = as.character(coalesce(qf,sf)),
            heat_lab = if_else(heat == "Qual",NA_character_,heat_lab))
   data_clean <- left_join(data_clean,
-                          lls,by = "name") %>%
+                          lls,by = "name") |>
     mutate(name = coalesce(ll_name,name))
 
   title <- paste(race_info$date,
@@ -64,40 +64,40 @@ spr_heat_plot <- function(.eventid,subtitle = "",time_scale = "median",clip = NU
                  paste0(race_info$length,"km"),
                  race_info$tech)
 
-  data_clean <- data_clean %>%
-    group_by(name) %>%
-    mutate(qual_only = all(heat == "Qual")) %>%
-    ungroup() %>%
-    filter(!qual_only) %>%
+  data_clean <- data_clean |>
+    group_by(name) |>
+    mutate(qual_only = all(heat == "Qual")) |>
+    ungroup() |>
+    filter(!qual_only) |>
     mutate(adv_thresh = case_when(heat == "Qual" ~ max(time[heat == "Qual"],na.rm = TRUE),
                                   heat == "QF" ~ max(time[ll == "Y" & heat == "QF"],na.rm = TRUE),
                                   heat == "SF" ~ max(time[ll == "Y" & heat == "SF"],na.rm = TRUE),
                                   heat == "Final" ~ max(time[heat == "Final" & rank == 3],na.rm = TRUE)))
 
   if (time_scale == "median"){
-    data_clean <- data_clean %>%
-      group_by(heat) %>%
+    data_clean <- data_clean |>
+      group_by(heat) |>
       mutate(time_y = time - median(time,na.rm = TRUE))
     y_lab <- "Difference from median time within round"
   }
   if (time_scale == "raw") {
-    data_clean <- data_clean %>%
-      group_by(heat) %>%
+    data_clean <- data_clean |>
+      group_by(heat) |>
       mutate(time_y = time)
     y_lab <- "Time in seconds"
   }
   if (time_scale == "thresh"){
-    data_clean <- data_clean %>%
-      group_by(heat) %>%
+    data_clean <- data_clean |>
+      group_by(heat) |>
       mutate(time_y = time - adv_thresh)
     y_lab <- "Difference from advancement time threshold"
   }
 
-  spr_final <- data_clean %>%
+  spr_final <- data_clean |>
     filter(name %in% data_clean$name[data_clean$fn == 1])
-  name_lev_ord <- spr_final %>%
-    filter(heat == "Final") %>%
-    arrange(rank) %>%
+  name_lev_ord <- spr_final |>
+    filter(heat == "Final") |>
+    arrange(rank) |>
     pull(name)
   spr_final$name <- factor(spr_final$name,levels = name_lev_ord)
 
@@ -128,10 +128,10 @@ skier_spr_heats <- function(ath_compid){
   sql <- glue::glue_sql(sql,
                         ath_compid = ath_compid,
                         .con = ..statskier_pg_con..)
-  spr_heats <- RPostgres::dbGetQuery(..statskier_pg_con..,sql) %>%
+  spr_heats <- RPostgres::dbGetQuery(..statskier_pg_con..,sql) |>
     select(eventid,name,nation,
            time = heat_time,
-           rank = heat_rank,qf,sf,fn,heat,ll) %>%
+           rank = heat_rank,qf,sf,fn,heat,ll) |>
     mutate(heat = case_when(substr(heat,1,1) == "1" ~ "quarter",
                             substr(heat,1,1) == "2" ~ "semi",
                             substr(heat,1,1) == "3" ~ "final"),
@@ -140,10 +140,10 @@ skier_spr_heats <- function(ath_compid){
                          labels = c("Qual","QF","SF","Final")))
 
   spr_qual <- tbl(src = ..statskier_pg_con..,
-                  dbplyr::in_schema("public","v_sprint")) %>%
-    filter(eventid %in% local(unique(spr_heats$eventid)) & !is.na(rankqual)) %>%
-    collect() %>%
-    select(eventid,name,nation,time,rank = rankqual) %>%
+                  dbplyr::in_schema("public","v_sprint")) |>
+    filter(eventid %in% local(unique(spr_heats$eventid)) & !is.na(rankqual)) |>
+    collect() |>
+    select(eventid,name,nation,time,rank = rankqual) |>
     mutate(heat = "qual",
            heat = factor(heat,
                          levels = c("qual","quarter","semi","final"),

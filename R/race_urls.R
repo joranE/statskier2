@@ -16,8 +16,8 @@ open_race_url <- function(eventid){
   }
   eid <- eventid
   urls <- tbl(src = ..statskier_pg_con..,
-              dbplyr::in_schema("public","v_event_url")) %>%
-    filter(eventid == eid) %>%
+              dbplyr::in_schema("public","v_event_url")) |>
+    filter(eventid == eid) |>
     collect()
   if (nrow(urls) == 0){
     stop("No URLs for that raceid yet.")

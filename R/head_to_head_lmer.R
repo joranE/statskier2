@@ -31,27 +31,27 @@ hth_lmer <- function(ath_names,
   events = match.arg(events)
 
   race_data <- tbl(src = ..statskier_pg_con..,
-                   dbplyr::in_schema("public","main")) %>%
-    filter(raceid == race_id) %>%
-    collect() %>%
+                   dbplyr::in_schema("public","main")) |>
+    filter(raceid == race_id) |>
+    collect() |>
     filter(rank <= num_opp | name %in% ath_names)
 
-  opp_names <- race_data %>%
-    filter(!name %in% ath_names) %>%
+  opp_names <- race_data |>
+    filter(!name %in% ath_names) |>
     pull(var = "name")
 
-  race_info <- race_data %>%
-    select(raceid,date,type,tech,start,length) %>%
+  race_info <- race_data |>
+    select(raceid,date,type,tech,start,length) |>
     distinct()
 
   race_day <- as.integer(as.Date(race_info$date))
 
   hth_df <- hth_data(athletes = ath_names,
-                     opponents = opp_names) %>%
+                     opponents = opp_names) |>
     filter(n_races >= min_encounters &
              race_day - as.integer(as.Date(date)) <= cutoff &
              type == race_info$type &
-             date <= race_info$date) %>%
+             date <= race_info$date) |>
     mutate(key = paste(ath_name,opp_name))
 
   if (events == 'maj_int'){
@@ -69,28 +69,28 @@ hth_lmer <- function(ath_names,
   w2 <- 1 / (race_day - as.integer(as.Date(mod_data$date)))
   w <- w2
   mod_data$weight <- w
-  pred_data <- hth_df %>%
+  pred_data <- hth_df |>
     filter(raceid == race_id &
              key %in% unique(mod_data$key))
 
 
-  m <- mod_data %>%
-    group_by(ath_name) %>%
+  m <- mod_data |>
+    group_by(ath_name) |>
     do(mod = lmer(diff_pb~length+tech+(1|opp_name),
                   data = .,
                   weights = .$weight))
-  pred_data_nest <- pred_data %>%
-    group_by(ath_name) %>%
+  pred_data_nest <- pred_data |>
+    group_by(ath_name) |>
     nest()
 
   m <- left_join(m,pred_data_nest,by = 'ath_name')
-  p <- m %>%
-    rowwise() %>%
+  p <- m |>
+    rowwise() |>
     do(preds = predict(object = .$mod,newdata = .$data))
   m <- bind_cols(m,p)
 
-  pred_final <- m %>%
-    select(-mod) %>%
+  pred_final <- m |>
+    select(-mod) |>
     unnest()
 
 

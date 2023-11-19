@@ -42,10 +42,10 @@ ath_plot_dst <- function(ath_names,
   }
 
   ath_data <- tbl(src = ..statskier_pg_con..,
-                  dbplyr::in_schema("public","v_distance")) %>%
-    filter(name %in% ath_names) %>%
-    collect() %>%
-    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) %>%
+                  dbplyr::in_schema("public","v_distance")) |>
+    filter(name %in% ath_names) |>
+    collect() |>
+    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) |>
     mutate(tech_name = ifelse(tech == 'C','Classic',
                               ifelse(tech == 'F','Freestyle','Pursuit')))
 
@@ -78,12 +78,12 @@ ath_plot_dst <- function(ath_names,
     grps <- c("name","season")
   }
 
-  ath_summary <- ath_data %>%
-    group_by_at(.vars = grps) %>%
+  ath_summary <- ath_data |>
+    group_by_at(.vars = grps) |>
     summarise(med = median(y,na.rm = TRUE),
-              n = n()) %>%
-    as.data.frame() %>%
-    filter(n >= 2) %>%
+              n = n()) |>
+    as.data.frame() |>
+    filter(n >= 2) |>
     mutate(date = paste0(substr(season,6,9),"-01-01"))
 
   ath_data$date <- as.Date(ath_data$date)
@@ -144,11 +144,12 @@ ath_plot_spr <- function(ath_names,
     races <- "maj_int"
   }
 
-  ath_data <- tbl(src = ..statskier_pg_con..,
-                  dbplyr::in_schema("public","v_sprint")) %>%
-    filter(name %in% ath_names) %>%
-    collect() %>%
-    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) %>%
+  ath_data <-
+    tbl(src = ..statskier_pg_con..,
+        dbplyr::in_schema("public","v_sprint")) |>
+    filter(name %in% ath_names) |>
+    collect() |>
+    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) |>
     mutate(tech_name = ifelse(tech == 'C','Classic','Freestyle'))
 
   if (races == "maj_int"){
@@ -175,12 +176,12 @@ ath_plot_spr <- function(ath_names,
     ylab <- "FIS Points"
   }
 
-  ath_summary <- ath_data %>%
-    group_by_at(.vars = grps) %>%
+  ath_summary <- ath_data |>
+    group_by_at(.vars = grps) |>
     summarise(med = median(y,na.rm = TRUE),
-              n = n()) %>%
-    as.data.frame() %>%
-    filter(n >= 2) %>%
+              n = n()) |>
+    as.data.frame() |>
+    filter(n >= 2) |>
     mutate(date = paste0(substr(season,6,9),"-01-01"))
 
   ath_data$date <- as.Date(ath_data$date)

@@ -34,18 +34,18 @@ spr_plot <- function(ath_names,by_tech = FALSE){
   }
 
   ath_data <- tbl(src = ..statskier_pg_con..,
-                  dbplyr::in_schema("public","v_sprint_maj_int")) %>%
+                  dbplyr::in_schema("public","v_sprint_maj_int")) |>
     filter(name %in% ath_names &
              season >= '2005-2006' &
-             !is.na(rank)) %>%
-    collect() %>%
+             !is.na(rank)) |>
+    collect() |>
     mutate(level = cut(rank,
                        breaks = c(-Inf,6,12,30,Inf),
                        labels = c('Final','Semi','Quarter','Qual')),
-           tech_long = ifelse(tech == 'F','Freestyle','Classic')) %>%
-    group_by_at(.vars = grps) %>%
-    summarise(n_result = n()) %>%
-    ungroup() %>%
+           tech_long = ifelse(tech == 'F','Freestyle','Classic')) |>
+    group_by_at(.vars = grps) |>
+    summarise(n_result = n()) |>
+    ungroup() |>
     mutate(level = factor(level,
                           levels = c('Qual','Quarter','Semi','Final')),
            season_abbr = substr(season,6,9))

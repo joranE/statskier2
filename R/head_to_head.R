@@ -51,8 +51,8 @@ hth_dst <- function(ath1,
   }
 
   hth_df <- hth_data(athletes = ath1,
-                     opponents = ath2) %>%
-    filter(type == 'Distance') %>%
+                     opponents = ath2) |>
+    filter(type == 'Distance') |>
     mutate(start = if_else(start == 'Pursuit','Mass',start))
 
   if (races == "maj_int"){
@@ -64,10 +64,10 @@ hth_dst <- function(ath1,
   summary_grps <- c('ath_name','opp_name','season')
   if (by_tech){
     summary_grps <- c(summary_grps,'tech')
-    ath_summary <- hth_df %>%
-      group_by(!!!rlang::syms(summary_grps)) %>%
-      summarise(med = median(y,na.rm = TRUE)) %>%
-      mutate(date = season_to_date(season)) %>%
+    ath_summary <- hth_df |>
+      group_by(!!!rlang::syms(summary_grps)) |>
+      summarise(med = median(y,na.rm = TRUE)) |>
+      mutate(date = season_to_date(season)) |>
       as.data.frame()
     line_piece <- geom_line(data = ath_summary,
                             aes(x = as.Date(date),y = med,color = tech),
@@ -75,20 +75,20 @@ hth_dst <- function(ath1,
   }
   if (by_start){
     summary_grps <- c(summary_grps,'start')
-    ath_summary <- hth_df %>%
-      group_by(!!!rlang::syms(summary_grps)) %>%
-      summarise(med = median(y,na.rm = TRUE)) %>%
-      mutate(date = season_to_date(season)) %>%
+    ath_summary <- hth_df |>
+      group_by(!!!rlang::syms(summary_grps)) |>
+      summarise(med = median(y,na.rm = TRUE)) |>
+      mutate(date = season_to_date(season)) |>
       as.data.frame()
     line_piece <- geom_line(data = ath_summary,
                             aes(x = as.Date(date),y = med,color = start),
                             size = 1.1)
   }
   if (!by_start && !by_tech){
-    ath_summary <- hth_df %>%
-      group_by(!!!rlang::syms(summary_grps)) %>%
-      summarise(med = median(y,na.rm = TRUE)) %>%
-      mutate(date = season_to_date(season)) %>%
+    ath_summary <- hth_df |>
+      group_by(!!!rlang::syms(summary_grps)) |>
+      summarise(med = median(y,na.rm = TRUE)) |>
+      mutate(date = season_to_date(season)) |>
       as.data.frame()
     line_piece <- geom_line(data = ath_summary,
                             aes(x = as.Date(date),y = med),
@@ -133,7 +133,7 @@ hth_spr <- function(ath1,
   measure <- match.arg(measure)
 
   hth_df <- hth_data(athletes = ath1,
-                     opponents = ath2) %>%
+                     opponents = ath2) |>
     filter(type == 'Sprint')
 
   if (races == "maj_int"){
@@ -145,19 +145,19 @@ hth_spr <- function(ath1,
   summary_grps <- c('ath_name','opp_name','season')
   if (by_tech){
     summary_grps <- c(summary_grps,'tech')
-    ath_summary <- hth_df %>%
-      group_by(!!!rlang::syms(summary_grps)) %>%
-      summarise(med = median(y,na.rm = TRUE)) %>%
-      mutate(date = season_to_date(season)) %>%
+    ath_summary <- hth_df |>
+      group_by(!!!rlang::syms(summary_grps)) |>
+      summarise(med = median(y,na.rm = TRUE)) |>
+      mutate(date = season_to_date(season)) |>
       as.data.frame()
     line_piece <- geom_line(data = ath_summary,
                             aes(x = as.Date(date),y = med,color = tech),
                             size = 1.1)
   }else{
-    ath_summary <- hth_df %>%
-      group_by(!!!rlang::syms(summary_grps)) %>%
-      summarise(med = median(y,na.rm = TRUE)) %>%
-      mutate(date = season_to_date(season)) %>%
+    ath_summary <- hth_df |>
+      group_by(!!!rlang::syms(summary_grps)) |>
+      summarise(med = median(y,na.rm = TRUE)) |>
+      mutate(date = season_to_date(season)) |>
       as.data.frame()
     line_piece <- geom_line(data = ath_summary,
                             aes(x = as.Date(date),y = med),

@@ -4,33 +4,33 @@ skier_results <- function(name = NULL,fisid = NULL,compid = NULL){
   v_spr <- dplyr::tbl(src = ..statskier_pg_con..,dbplyr::in_schema("public","v_sprint"))
 
   if (!is.null(fisid)){
-    dst_res <- v_dst %>%
-      filter(fisid %in% local(fisid)) %>%
-      collect() %>%
+    dst_res <- v_dst |>
+      filter(fisid %in% local(fisid)) |>
+      collect() |>
       mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
-    spr_res <- v_spr %>%
-      filter(fisid %in% local(fisid)) %>%
-      collect() %>%
+    spr_res <- v_spr |>
+      filter(fisid %in% local(fisid)) |>
+      collect() |>
       mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
   }
   if (!is.null(compid)){
-    dst_res <- v_dst %>%
-      filter(fisid %in% local(compid)) %>%
-      collect() %>%
+    dst_res <- v_dst |>
+      filter(fisid %in% local(compid)) |>
+      collect() |>
       mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
-    spr_res <- v_spr %>%
-      filter(fisid %in% local(compid)) %>%
-      collect() %>%
+    spr_res <- v_spr |>
+      filter(fisid %in% local(compid)) |>
+      collect() |>
       mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
   }
   if (!is.null(name)){
-    dst_res <- v_dst %>%
-      filter(fisid %in% local(name)) %>%
-      collect() %>%
+    dst_res <- v_dst |>
+      filter(fisid %in% local(name)) |>
+      collect() |>
       mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
-    spr_res <- v_spr %>%
-      filter(fisid %in% local(name)) %>%
-      collect() %>%
+    spr_res <- v_spr |>
+      filter(fisid %in% local(name)) |>
+      collect() |>
       mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
   }
 

@@ -33,26 +33,26 @@ nation_dst_trend <- function(.nation,
   }
 
   mx_lev <- max(levels,na.rm = TRUE)
-  dat <- v_dst %>%
+  dat <- v_dst |>
     filter(nation %in% .nation &
              !is.na(rank) &
              rank <= mx_lev &
-             nation != location) %>%
+             nation != location) |>
     collect()
 
-  dat <- dat %>%
-    mutate(rank_cat = cut(x = rank,breaks = c(0,levels),labels = names(levels))) %>%
-    group_by(nation,gender,season) %>%
+  dat <- dat |>
+    mutate(rank_cat = cut(x = rank,breaks = c(0,levels),labels = names(levels))) |>
+    group_by(nation,gender,season) |>
     mutate(n_ev = n_distinct(eventid))
 
-  dat_grp <- dat %>%
-    group_by(nation,gender,season,rank_cat) %>%
+  dat_grp <- dat |>
+    group_by(nation,gender,season,rank_cat) |>
     summarise(n = n(),
-              pct = n / n_ev[1]) %>%
-    ungroup() %>%
-    mutate(date = season_to_date(season)) %>%
-    group_by(nation,gender,rank_cat) %>%
-    arrange(date) %>%
+              pct = n / n_ev[1]) |>
+    ungroup() |>
+    mutate(date = season_to_date(season)) |>
+    group_by(nation,gender,rank_cat) |>
+    arrange(date) |>
     mutate(pct_roll = zoo::rollmeanr(x = pct,k = 3,fill = NA))
 
   p <- ggplot(data = dat_grp,aes(x = as.Date(date),y = pct_roll,color = rank_cat,group = rank_cat)) +
@@ -76,28 +76,28 @@ nation_spr_trend <- function(.nation,
   }
 
   mx_lev <- max(levels,na.rm = TRUE)
-  dat <- v_spr %>%
+  dat <- v_spr |>
     filter(nation %in% .nation &
              !is.na(rank) &
              rank <= mx_lev &
-             nation != location) %>%
+             nation != location) |>
     collect()
 
-  dat <- dat %>%
+  dat <- dat |>
     mutate(rank_cat = cut(x = rank,
                           breaks = c(0,levels),
-                          labels = names(levels))) %>%
-    group_by(nation,gender,season) %>%
+                          labels = names(levels))) |>
+    group_by(nation,gender,season) |>
     mutate(n_ev = n_distinct(eventid))
 
-  dat_grp <- dat %>%
-    group_by(nation,gender,season,rank_cat) %>%
+  dat_grp <- dat |>
+    group_by(nation,gender,season,rank_cat) |>
     summarise(n = n(),
-              pct = n / n_ev[1]) %>%
-    ungroup() %>%
-    mutate(date = season_to_date(season)) %>%
-    group_by(nation,gender,rank_cat) %>%
-    arrange(date) %>%
+              pct = n / n_ev[1]) |>
+    ungroup() |>
+    mutate(date = season_to_date(season)) |>
+    group_by(nation,gender,rank_cat) |>
+    arrange(date) |>
     mutate(pct_roll = zoo::rollmeanr(x = pct,k = 3,fill = NA))
 
   p <- ggplot(data = dat_grp,aes(x = as.Date(date),

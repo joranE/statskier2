@@ -5,7 +5,8 @@ dev_cohort_dst_qgam <- function(top_k = 10,
                                 age = 30,
                                 q = c(0.1,0.9),
                                 type = "fispoints"){
-  dst_sql <- statskier2::read_sql("inst/sql/cohort_dst.sql")
+  sql_path <- system.file('sql/cohort_dst.sql',package = 'statskier2')
+  dst_sql <- statskier2::read_sql(sql_path)
   dst_sql <- glue::glue_sql(dst_sql,
                             rnk = top_k,
                             age = age,
@@ -14,17 +15,17 @@ dev_cohort_dst_qgam <- function(top_k = 10,
   message("Fetching data...")
   dst_result <- RPostgres::dbGetQuery(..statskier_pg_con..,dst_sql)
   dst_result$gender <- as.factor(dst_result$gender)
-  dst_result <- dst_result %>%
+  dst_result <- dst_result |>
     mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
 
   if (type == "fispoints"){
-    dst_result <- dst_result %>%
+    dst_result <- dst_result |>
       filter(!is.na(fispoints) & !is.na(age))
     dst_result_men <- filter(dst_result,gender == "Men")
     dst_result_wom <- filter(dst_result,gender == "Women")
-    tuning_data_men <- dst_result_men %>%
+    tuning_data_men <- dst_result_men |>
       slice_sample(prop = 0.1)
-    tuning_data_wom <- dst_result_wom %>%
+    tuning_data_wom <- dst_result_wom |>
       slice_sample(prop = 0.1)
     message("Estimating lsig...")
     tune_lsig_men <- qgam::tuneLearnFast(form = fispoints ~ s(age),
@@ -47,9 +48,9 @@ dev_cohort_dst_qgam <- function(top_k = 10,
                                lsig = tune_lsig_wom$lsig)
   }
   if (type == "pbm_pts"){
-    dst_result <- dst_result %>%
+    dst_result <- dst_result |>
       filter(!is.na(pbm_pts) & !is.na(age))
-    tuning_data <- dst_result %>%
+    tuning_data <- dst_result |>
       slice_sample(prop = 0.1)
     message("Estimating lsig...")
     tune_lsig <- qgam::tuneLearnFast(form = pbm_pts ~ s(age,by = gender),
@@ -93,7 +94,8 @@ dev_cohort_spr_qgam <- function(top_k = 12,
                                 age = 30,
                                 q = c(0.1,0.9),
                                 type = "fispoints"){
-  spr_sql <- read_sql("inst/sql/cohort_spr.sql")
+  sql_path <- system.file('sql/cohort_spr.sql',package = 'statskier2')
+  spr_sql <- read_sql(sql_path)
   spr_sql <- glue::glue_sql(spr_sql,
                             rnk = top_k,
                             age = age,
@@ -101,17 +103,17 @@ dev_cohort_spr_qgam <- function(top_k = 12,
                             .con = ..statskier_pg_con..)
   spr_result <- RPostgres::dbGetQuery(..statskier_pg_con..,spr_sql)
   spr_result$gender <- as.factor(spr_result$gender)
-  spr_result <- spr_result %>%
+  spr_result <- spr_result |>
     mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
 
   if (type == "fispoints"){
-    spr_result <- spr_result %>%
+    spr_result <- spr_result |>
       filter(!is.na(fispoints) & !is.na(age))
     spr_result_men <- filter(spr_result,gender == "Men")
     spr_result_wom <- filter(spr_result,gender == "Women")
-    tuning_data_men <- spr_result_men %>%
+    tuning_data_men <- spr_result_men |>
       slice_sample(prop = 0.1)
-    tuning_data_wom <- spr_result_wom %>%
+    tuning_data_wom <- spr_result_wom |>
       slice_sample(prop = 0.1)
     message("Estimating lsig...")
     tune_lsig_men <- qgam::tuneLearnFast(form = fispoints ~ s(age),
@@ -134,7 +136,7 @@ dev_cohort_spr_qgam <- function(top_k = 12,
                                lsig = tune_lsig_wom$lsig)
   }
   if (type == "pbm_pts"){
-    spr_result <- spr_result %>%
+    spr_result <- spr_result |>
       filter(!is.na(pbm_pts) & !is.na(age))
     spr_mod <- qgam::mqgam(form = pbm_pts ~ s(age,by = gender),
                            data = spr_result,
@@ -172,17 +174,17 @@ dev_cohort_dst <- function(ath_fisid,
                            .subtitle = ""){
   ath_res <- skier_results(fisid = ath_fisid)
 
-  ath_res$dst <- ath_res$dst %>%
-    mutate(fisid_fac = factor(fisid,levels = ath_fisid)) %>%
-    arrange(fisid_fac,date) %>%
-    mutate(name_fac = forcats::fct_inorder(name)) %>%
+  ath_res$dst <- ath_res$dst |>
+    mutate(fisid_fac = factor(fisid,levels = ath_fisid)) |>
+    arrange(fisid_fac,date) |>
+    mutate(name_fac = forcats::fct_inorder(name)) |>
     mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
 
   max_age_dst <- max(ath_res$dst$age,na.rm = TRUE) + 1
 
-  new_data_dst_name <- ath_res$dst %>%
-    select(gender,name) %>%
-    distinct() %>%
+  new_data_dst_name <- ath_res$dst |>
+    select(gender,name) |>
+    distinct() |>
     left_join(cohort_data,by = "gender")
 
   ylab <- switch(EXPR = type,fispoints = "FIS Points",pbm_pts = "PBM Points")
@@ -217,17 +219,17 @@ dev_cohort_spr <- function(ath_fisid,
                            .subtitle = ""){
   ath_res <- skier_results(fisid = ath_fisid)
 
-  ath_res$spr <- ath_res$spr %>%
-    mutate(fisid_fac = factor(fisid,levels = ath_fisid)) %>%
-    arrange(fisid_fac,date) %>%
-    mutate(name_fac = forcats::fct_inorder(name)) %>%
+  ath_res$spr <- ath_res$spr |>
+    mutate(fisid_fac = factor(fisid,levels = ath_fisid)) |>
+    arrange(fisid_fac,date) |>
+    mutate(name_fac = forcats::fct_inorder(name)) |>
     mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
 
   max_age_spr <- max(ath_res$spr$age,na.rm = TRUE) + 5
 
-  new_data_spr_name <- ath_res$spr %>%
-    select(gender,name) %>%
-    distinct() %>%
+  new_data_spr_name <- ath_res$spr |>
+    select(gender,name) |>
+    distinct() |>
     left_join(cohort_data,by = "gender")
 
   ylab <- switch(EXPR = type,fispoints = "FIS Points",pbm_pts = "PBM Points")

@@ -10,20 +10,20 @@
 dst_elo_data <- function(default_rating = 1300,maj_int = FALSE){
 
   dst <- tbl(src = ..statskier_pg_con..,
-             dbplyr::in_schema("public","v_distance")) %>%
-    arrange(date,eventid,rank) %>%
-    collect() %>%
+             dbplyr::in_schema("public","v_distance")) |>
+    arrange(date,eventid,rank) |>
+    collect() |>
     mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
 
   if (maj_int){
-    dst <- dst %>%
+    dst <- dst |>
       filter(cat1 %in% MAJ_INT)
   }
 
-  current_rating_dst <- dst %>%
-    select(gender,fisid,name,nation,date) %>%
-    unique() %>%
-    group_by(gender,fisid,name) %>%
+  current_rating_dst <- dst |>
+    select(gender,fisid,name,nation,date) |>
+    unique() |>
+    group_by(gender,fisid,name) |>
     summarise(nation = nation[date == max(date)][1])
   current_rating_dst$race_count <- 0L
   current_rating_dst$cur_rating <- default_rating
@@ -49,20 +49,20 @@ dst_elo_data <- function(default_rating = 1300,maj_int = FALSE){
 spr_elo_data <- function(default_rating = 1300,maj_int = FALSE){
 
   spr <- tbl(src = ..statskier_pg_con..,
-             dbplyr::in_schema("public","v_sprint")) %>%
-    arrange(date,raceid,rank) %>%
-    collect() %>%
+             dbplyr::in_schema("public","v_sprint")) |>
+    arrange(date,raceid,rank) |>
+    collect() |>
     mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
 
   if (maj_int){
-    spr <- spr %>%
+    spr <- spr |>
       filter(cat1 %in% MAJ_INT)
   }
 
-  current_rating_spr <- spr %>%
-    select(gender,fisid,name,nation,date) %>%
-    unique() %>%
-    group_by(gender,fisid,name) %>%
+  current_rating_spr <- spr |>
+    select(gender,fisid,name,nation,date) |>
+    unique() |>
+    group_by(gender,fisid,name) |>
     summarise(nation = nation[date == max(date)][1])
   current_rating_spr$race_count <- 0L
   current_rating_spr$cur_rating <- default_rating

@@ -30,12 +30,12 @@ race_snapshot_dst <- function(event_id,
                               method = "pbm",
                               adj_pbm_pts = FALSE){
   cur_race <- tbl(src = ..statskier_pg_con..,
-                  dbplyr::in_schema("public","v_distance_maj_int")) %>%
-    filter(eventid == event_id) %>%
-    arrange(rank) %>%
-    collect() %>%
-    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) %>%
-    mutate(name1 = paste(shorten_names(name),rank)) %>%
+                  dbplyr::in_schema("public","v_distance_maj_int")) |>
+    filter(eventid == event_id) |>
+    arrange(rank) |>
+    collect() |>
+    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) |>
+    mutate(name1 = paste(shorten_names(name),rank)) |>
     arrange(rank)
   full_race <- cur_race
 
@@ -65,66 +65,66 @@ race_snapshot_dst <- function(event_id,
   cutoff_date <- as.character(as.Date(race_date) - cutoff)
 
   race_history <- tbl(src = ..statskier_pg_con..,
-                      dbplyr::in_schema("public","v_distance_maj_int")) %>%
+                      dbplyr::in_schema("public","v_distance_maj_int")) |>
     filter(compid %in% local(cur_race$compid) &
              date < race_date &
-             date >= cutoff_date) %>%
-    collect() %>%
-    left_join(cur_race[,c('name','name1')],by = 'name') %>%
+             date >= cutoff_date) |>
+    collect() |>
+    left_join(cur_race[,c('name','name1')],by = 'name') |>
     mutate(same_tech = ifelse(tech == race_tech,'Yes','No'),
-           same_format = ifelse(format %in% race_format,'Yes','No')) %>%
-    group_by(name) %>%
-    mutate(nrace_overall = n()) %>%
-    group_by(name,same_tech) %>%
-    mutate(nrace_tech = n()) %>%
-    group_by(name,same_format) %>%
-    mutate(nrace_format = n()) %>%
+           same_format = ifelse(format %in% race_format,'Yes','No')) |>
+    group_by(name) |>
+    mutate(nrace_overall = n()) |>
+    group_by(name,same_tech) |>
+    mutate(nrace_tech = n()) |>
+    group_by(name,same_format) |>
+    mutate(nrace_format = n()) |>
     as.data.frame()
 
-  ath_min_races_overall <- race_history %>%
-    filter(nrace_overall < 10) %>%
+  ath_min_races_overall <- race_history |>
+    filter(nrace_overall < 10) |>
     as.data.frame()
-  ath_min_races_tech <- race_history %>%
-    filter(same_tech == 'Yes' & nrace_tech < 10) %>%
+  ath_min_races_tech <- race_history |>
+    filter(same_tech == 'Yes' & nrace_tech < 10) |>
     as.data.frame()
-  ath_min_races_format <- race_history %>%
-    filter(same_format == 'Yes' & nrace_format < 10) %>%
+  ath_min_races_format <- race_history |>
+    filter(same_format == 'Yes' & nrace_format < 10) |>
     as.data.frame()
   ath_min <- bind_rows(setNames(list(ath_min_races_overall,ath_min_races_tech,ath_min_races_format),
                                 c('Overall',tech_label,format_label)),
                        .id = 'facet_grp')
 
   if (method == "pbm"){
-    ath_bars_overall <- race_history %>%
-      filter(nrace_overall >= 10) %>%
-      group_by(name1) %>%
+    ath_bars_overall <- race_history |>
+      filter(nrace_overall >= 10) |>
+      group_by(name1) |>
       summarise(q25 = quantile(pbm,0.25,na.rm = TRUE),
                 q75 = quantile(pbm,0.75,na.rm = TRUE))
-    ath_bars_tech <- race_history %>%
-      filter(same_tech == 'Yes' & nrace_tech >= 10) %>%
-      group_by(name1) %>%
+    ath_bars_tech <- race_history |>
+      filter(same_tech == 'Yes' & nrace_tech >= 10) |>
+      group_by(name1) |>
       summarise(q25 = quantile(pbm,0.25,na.rm = TRUE),
                 q75 = quantile(pbm,0.75,na.rm = TRUE))
-    ath_bars_format <- race_history %>%
-      filter(same_format == 'Yes' & nrace_format >= 10) %>%
-      group_by(name1) %>%
+    ath_bars_format <- race_history |>
+      filter(same_format == 'Yes' & nrace_format >= 10) |>
+      group_by(name1) |>
       summarise(q25 = quantile(pbm,0.25,na.rm = TRUE),
                 q75 = quantile(pbm,0.75,na.rm = TRUE))
   }
   if (method == "pbm_pts"){
-    ath_bars_overall <- race_history %>%
-      filter(nrace_overall >= 10) %>%
-      group_by(name1) %>%
+    ath_bars_overall <- race_history |>
+      filter(nrace_overall >= 10) |>
+      group_by(name1) |>
       summarise(q25 = quantile(pbm_pts,0.25,na.rm = TRUE),
                 q75 = quantile(pbm_pts,0.75,na.rm = TRUE))
-    ath_bars_tech <- race_history %>%
-      filter(same_tech == 'Yes' & nrace_tech >= 10) %>%
-      group_by(name1) %>%
+    ath_bars_tech <- race_history |>
+      filter(same_tech == 'Yes' & nrace_tech >= 10) |>
+      group_by(name1) |>
       summarise(q25 = quantile(pbm_pts,0.25,na.rm = TRUE),
                 q75 = quantile(pbm_pts,0.75,na.rm = TRUE))
-    ath_bars_format <- race_history %>%
-      filter(same_format == 'Yes' & nrace_format >= 10) %>%
-      group_by(name1) %>%
+    ath_bars_format <- race_history |>
+      filter(same_format == 'Yes' & nrace_format >= 10) |>
+      group_by(name1) |>
       summarise(q25 = quantile(pbm_pts,0.25,na.rm = TRUE),
                 q75 = quantile(pbm_pts,0.75,na.rm = TRUE))
   }
@@ -225,12 +225,12 @@ race_snapshot_spr <- function(event_id,
                               cutoff = 365 * 4,
                               reduced = TRUE){
   cur_race <- tbl(src = ..statskier_pg_con..,
-                  dbplyr::in_schema("public","v_sprint_maj_int")) %>%
-    filter(eventid == event_id) %>%
-    arrange(rank) %>%
-    collect() %>%
-    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) %>%
-    mutate(name1 = paste(shorten_names(name),rank)) %>%
+                  dbplyr::in_schema("public","v_sprint_maj_int")) |>
+    filter(eventid == event_id) |>
+    arrange(rank) |>
+    collect() |>
+    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) |>
+    mutate(name1 = paste(shorten_names(name),rank)) |>
     arrange(rank)
 
   if (reduced){
@@ -246,38 +246,38 @@ race_snapshot_spr <- function(event_id,
   cutoff_date <- as.character(as.Date(race_date) - cutoff)
 
   race_history <- tbl(src = ..statskier_pg_con..,
-                      dbplyr::in_schema("public","v_sprint_maj_int")) %>%
+                      dbplyr::in_schema("public","v_sprint_maj_int")) |>
     filter(name %in% local(cur_race$name) &
              date < race_date &
-             date >= cutoff_date) %>%
-    collect() %>%
-    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) %>%
-    left_join(cur_race[,c('name','name1')],by = 'name') %>%
-    mutate(same_tech = ifelse(tech == race_tech,'Yes','No')) %>%
-    group_by(name) %>%
-    mutate(nrace_overall = n()) %>%
-    group_by(name,same_tech) %>%
-    mutate(nrace_tech = n()) %>%
+             date >= cutoff_date) |>
+    collect() |>
+    mutate_if(.predicate = bit64::is.integer64,.funs = as.integer) |>
+    left_join(cur_race[,c('name','name1')],by = 'name') |>
+    mutate(same_tech = ifelse(tech == race_tech,'Yes','No')) |>
+    group_by(name) |>
+    mutate(nrace_overall = n()) |>
+    group_by(name,same_tech) |>
+    mutate(nrace_tech = n()) |>
     as.data.frame()
 
-  ath_min_races_overall <- race_history %>%
-    filter(nrace_overall < 10) %>%
+  ath_min_races_overall <- race_history |>
+    filter(nrace_overall < 10) |>
     as.data.frame()
-  ath_min_races_tech <- race_history %>%
-    filter(same_tech == 'Yes' & nrace_tech < 10) %>%
+  ath_min_races_tech <- race_history |>
+    filter(same_tech == 'Yes' & nrace_tech < 10) |>
     as.data.frame()
   ath_min <- bind_rows(setNames(list(ath_min_races_overall,ath_min_races_tech),
                                 c('Overall',tech_label)),
                        .id = 'facet_grp')
 
-  ath_bars_overall <- race_history %>%
-    filter(nrace_overall >= 10) %>%
-    group_by(name1) %>%
+  ath_bars_overall <- race_history |>
+    filter(nrace_overall >= 10) |>
+    group_by(name1) |>
     summarise(q25 = quantile(rank,0.25,na.rm = TRUE),
               q75 = quantile(rank,0.75,na.rm = TRUE))
-  ath_bars_tech <- race_history %>%
-    filter(same_tech == 'Yes' & nrace_tech >= 10) %>%
-    group_by(name1) %>%
+  ath_bars_tech <- race_history |>
+    filter(same_tech == 'Yes' & nrace_tech >= 10) |>
+    group_by(name1) |>
     summarise(q25 = quantile(rank,0.25,na.rm = TRUE),
               q75 = quantile(rank,0.75,na.rm = TRUE))
   ath_bars <- bind_rows(setNames(list(ath_bars_overall,ath_bars_tech),

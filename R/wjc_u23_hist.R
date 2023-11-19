@@ -19,28 +19,28 @@
 #' }
 wjc_u23_plot <- function(nations,races = c('wjc','wu23')){
   races <- match.arg(races)
-  dst <- tbl(..statskier_pg_con..,dbplyr::in_schema("public","v_distance")) %>%
+  dst <- tbl(..statskier_pg_con..,dbplyr::in_schema("public","v_distance")) |>
     filter(primary_tag == races &
-             nation %in% nations) %>%
+             nation %in% nations) |>
     collect()
-  spr <- tbl(..statskier_pg_con..,dbplyr::in_schema("public","v_sprint")) %>%
+  spr <- tbl(..statskier_pg_con..,dbplyr::in_schema("public","v_sprint")) |>
     filter(primary_tag == races &
-             nation %in% nations) %>%
+             nation %in% nations) |>
     collect()
 
-  dst_spr <- dst %>%
-    mutate(event_type = "Distance") %>%
-    select(event_type,season,date,event_type,gender,compid,nation,rank) %>%
-    bind_rows(mutate(spr,event_type = "Sprint") %>%
+  dst_spr <- dst |>
+    mutate(event_type = "Distance") |>
+    select(event_type,season,date,event_type,gender,compid,nation,rank) |>
+    bind_rows(mutate(spr,event_type = "Sprint") |>
                 select(event_type,season,date,event_type,gender,compid,nation,rank))
 
   sprCutoff <- data.frame(event_type = c('Sprint','Sprint'),
                           gender = c('Men','Women'),
                           yint = c(30,30))
 
-  dst_spr_med <- dst_spr %>%
-    group_by(nation,gender,event_type,season) %>%
-    summarise(med = median(rank,na.rm = TRUE)) %>%
+  dst_spr_med <- dst_spr |>
+    group_by(nation,gender,event_type,season) |>
+    summarise(med = median(rank,na.rm = TRUE)) |>
     mutate(date = season_to_date(season))
 
   dst_spr <- split(dst_spr,dst_spr$nation)

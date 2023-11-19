@@ -20,9 +20,9 @@ find_skier <- function(x){
                       dbplyr::in_schema("public","skier"))
 
   x <- paste0("%",x,"%")
-  results <- skier %>%
-    filter(name %like% x) %>%
-    collect() %>%
+  results <- skier |>
+    filter(name %like% x) |>
+    collect() |>
     mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
   results
 }
@@ -32,9 +32,9 @@ skier_info <- function(.compid){
   skier <- dplyr::tbl(src = ..statskier_pg_con..,
                       dbplyr::in_schema("public","skier"))
 
-  result <- skier %>%
-    filter(compid %in% .compid) %>%
-    collect() %>%
+  result <- skier |>
+    filter(compid %in% .compid) |>
+    collect() |>
     mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
 
   result

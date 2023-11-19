@@ -12,7 +12,7 @@ dst_hth_data <- function(ath_compid,opp_compid){
                         ath_compid = ath_compid,
                         opp_compid = opp_compid,
                         .con = ..statskier_pg_con..)
-  result <- RPostgres::dbGetQuery(..statskier_pg_con..,sql) %>%
+  result <- RPostgres::dbGetQuery(..statskier_pg_con..,sql) |>
     dplyr::mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
   result
 }
@@ -30,7 +30,7 @@ spr_hth_data <- function(ath_compid,opp_compid){
                         ath_compid = ath_compid,
                         opp_compid = opp_compid,
                         .con = ..statskier_pg_con..)
-  result <- RPostgres::dbGetQuery(..statskier_pg_con..,sql) %>%
+  result <- RPostgres::dbGetQuery(..statskier_pg_con..,sql) |>
     dplyr::mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
   result
 }
@@ -48,7 +48,7 @@ spr_heats_hth_data <- function(ath_compid,opp_compid){
                         ath_compid = ath_compid,
                         opp_compid = opp_compid,
                         .con = ..statskier_pg_con..)
-  result <- RPostgres::dbGetQuery(..statskier_pg_con..,sql) %>%
+  result <- RPostgres::dbGetQuery(..statskier_pg_con..,sql) |>
     dplyr::mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
   result
 }
@@ -68,7 +68,7 @@ common_opponents <- function(ath_compid1,ath_compid2,min_date,max_date){
                         min_date = min_date,
                         max_date = max_date,
                         .con = ..statskier_pg_con..)
-  result <- RPostgres::dbGetQuery(..statskier_pg_con..,sql) %>%
+  result <- RPostgres::dbGetQuery(..statskier_pg_con..,sql) |>
     dplyr::mutate_if(.predicate = bit64::is.integer64,.funs = as.integer)
   result
 }
