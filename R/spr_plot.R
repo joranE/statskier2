@@ -16,66 +16,83 @@
 #' @examples
 #' \dontrun{
 #' library(ggplot2)
-#' p <- spr_plot(ath_names = c('NEWELL Andrew','HAMILTON Simeon'))
+#' p <- spr_plot(ath_names = c("NEWELL Andrew", "HAMILTON Simeon"))
 #' print(p$plot)
 #' }
-spr_plot <- function(ath_names,by_tech = FALSE){
-
-  if (length(ath_names) == 1){
-    ath_names <- c(ath_names,ath_names)
+spr_plot <- function(ath_names, by_tech = FALSE) {
+  if (length(ath_names) == 1) {
+    ath_names <- c(ath_names, ath_names)
   }
 
-  if (by_tech){
-    grps <- c('name','season','tech_long','level')
-    facet <- facet_grid(name~tech_long)
-  }else{
-    grps <- c('name','season','level')
+  if (by_tech) {
+    grps <- c("name", "season", "tech_long", "level")
+    facet <- facet_grid(name ~ tech_long)
+  } else {
+    grps <- c("name", "season", "level")
     facet <- facet_wrap(~name)
   }
 
-  ath_data <- tbl(src = ..statskier_pg_con..,
-                  dbplyr::in_schema("public","v_sprint_maj_int")) |>
+  ath_data <- tbl(
+    src = ..statskier_pg_con..,
+    dbplyr::in_schema("public", "v_sprint_maj_int")
+  ) |>
     filter(name %in% ath_names &
-             season >= '2005-2006' &
-             !is.na(rank)) |>
+      season >= "2005-2006" &
+      !is.na(rank)) |>
     collect() |>
-    mutate(level = cut(rank,
-                       breaks = c(-Inf,6,12,30,Inf),
-                       labels = c('Final','Semi','Quarter','Qual')),
-           tech_long = ifelse(tech == 'F','Freestyle','Classic')) |>
+    mutate(
+      level = cut(rank,
+        breaks = c(-Inf, 6, 12, 30, Inf),
+        labels = c("Final", "Semi", "Quarter", "Qual")
+      ),
+      tech_long = ifelse(tech == "F", "Freestyle", "Classic")
+    ) |>
     group_by_at(.vars = grps) |>
     summarise(n_result = n()) |>
     ungroup() |>
-    mutate(level = factor(level,
-                          levels = c('Qual','Quarter','Semi','Final')),
-           season_abbr = substr(season,6,9))
+    mutate(
+      level = factor(level,
+        levels = c("Qual", "Quarter", "Semi", "Final")
+      ),
+      season_abbr = substr(season, 6, 9)
+    )
 
-  lower <- filter(ath_data,level == 'Qual')
-  upper <- filter(ath_data,level != 'Qual')
+  lower <- filter(ath_data, level == "Qual")
+  upper <- filter(ath_data, level != "Qual")
 
-  upper$level <- factor(upper$level,levels = rev(levels(upper$level)))
-  upper <- arrange(upper,name,season,desc(level))
+  upper$level <- factor(upper$level, levels = rev(levels(upper$level)))
+  upper <- arrange(upper, name, season, desc(level))
 
   p <- ggplot() +
     facet +
-    geom_bar(data = lower,
-             aes(x = season_abbr,y = -n_result,fill = level),
-             width = 0.5,
-             position = "stack",
-             stat = "identity") +
-    geom_bar(data = upper,
-             aes(x = season_abbr,y = n_result,fill = level),
-             width = 0.5,
-             position = "stack",
-             stat = "identity") +
-    geom_hline(yintercept = 0,color = "black") +
-    labs(x = "Season",y = "Number of Races",fill = "Max\nround\nreached") +
+    geom_bar(
+      data = lower,
+      aes(x = season_abbr, y = -n_result, fill = level),
+      color = 'black',
+      width = 0.5,
+      position = "stack",
+      stat = "identity"
+    ) +
+    geom_bar(
+      data = upper,
+      aes(x = season_abbr, y = n_result, fill = level),
+      color = 'black',
+      width = 0.5,
+      position = "stack",
+      stat = "identity"
+    ) +
+    geom_hline(yintercept = 0, color = "black") +
+    labs(x = "Season", y = "Number of Races", fill = "Max\nround\nreached") +
     scale_y_continuous(labels = abs) +
-    scale_fill_manual(values = RColorBrewer::brewer.pal(6,"Blues")[6:3],
-                      breaks = c('Final','Semi','Quarter','Qual')) +
+    scale_fill_manual(
+      values = RColorBrewer::brewer.pal(6, "Blues")[6:3],
+      breaks = c("Final", "Semi", "Quarter", "Qual")
+    ) +
     theme_bw() +
-    theme(axis.text.x = element_text(hjust = 0,vjust = 1,angle = 310))
+    theme(axis.text.x = element_text(hjust = 0, vjust = 1, angle = 310))
 
-  return(list(plot = p,
-              ath_data = ath_data))
+  return(list(
+    plot = p,
+    ath_data = ath_data
+  ))
 }

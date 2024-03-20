@@ -10,27 +10,28 @@
 #' @return A database connection object
 #' @export
 #' @import RPostgres
-statskier_connect <- function(){
+statskier_connect <- function() {
   con_info <- options()$statskier_pg
-  if (!is.null(con_info)){
+  if (!is.null(con_info)) {
     con <- RPostgres::dbConnect(RPostgres::Postgres(),
-                                host = con_info$host,
-                                dbname = con_info$dbname,
-                                user = con_info$user,
-                                password = con_info$password,
-                                port = con_info$port,
-                                sslmode = con_info$sslmode,
-                                bigint = "integer")
-    assign(x = "..statskier_pg_con..",value = con,envir = .GlobalEnv)
+      host = con_info$host,
+      dbname = con_info$dbname,
+      user = con_info$user,
+      password = con_info$password,
+      port = con_info$port,
+      sslmode = con_info$sslmode,
+      bigint = "integer"
+    )
+    assign(x = "..statskier_pg_con..", value = con, envir = .GlobalEnv)
     message("Connected to statskier db.")
-  }else{
+  } else {
     message("Connection info not found in options('statskier_pg').")
   }
 }
 
 #' @export
-statskier_disconnect <- function(){
-  if (!exists(x = "..statskier_pg_con..",envir = .GlobalEnv)){
+statskier_disconnect <- function() {
+  if (!exists(x = "..statskier_pg_con..", envir = .GlobalEnv)) {
     stop("Connection object ..statskier_pg_con.. not found.")
   } else {
     RPostgres::dbDisconnect(..statskier_pg_con..)

@@ -8,14 +8,16 @@
 #' @return A list with components \code{orig} with the original statistic and
 #' \code{bs} a vector of the bootstrapped statistics
 #' @export
-bs_top_n <- function(vec,n = 5,B = 1000){
+bs_top_n <- function(vec, n = 5, B = 1000) {
   n_vec <- length(vec)
   vec <- vec[!is.na(vec)]
-  if (n_vec < n) return(list(orig = NA,bs = rep(NA,B)))
+  if (n_vec < n) {
+    return(list(orig = NA, bs = rep(NA, B)))
+  }
   orig <- mean(sort(vec)[seq_len(n)])
-  mat <- replicate(n = B,sort(sample(x = vec,size = n_vec,replace = TRUE))[seq_len(n)])
+  mat <- replicate(n = B, sort(sample(x = vec, size = n_vec, replace = TRUE))[seq_len(n)])
   bs_vals <- colMeans(mat)
-  list(orig = orig,bs = bs_vals)
+  list(orig = orig, bs = bs_vals)
 }
 
 #' Bootstrap Median
@@ -28,14 +30,16 @@ bs_top_n <- function(vec,n = 5,B = 1000){
 #' \code{bs} a vector of the bootstrapped statistics
 #' @importFrom matrixStats colMedians
 #' @export
-bs_median <- function(vec,B = 1000){
+bs_median <- function(vec, B = 1000) {
   n <- length(vec)
   vec <- vec[!is.na(vec)]
-  if (n == 1) return(list(orig = NA,bs = rep(NA,B)))
+  if (n == 1) {
+    return(list(orig = NA, bs = rep(NA, B)))
+  }
   orig <- median(vec)
-  mat <- matrix(vec[sample(n,n*B,replace = TRUE)],nrow = n,ncol = B,byrow = FALSE)
+  mat <- matrix(vec[sample(n, n * B, replace = TRUE)], nrow = n, ncol = B, byrow = FALSE)
   bs_vals <- matrixStats::colMedians(mat)
-  list(orig = orig,bs = bs_vals)
+  list(orig = orig, bs = bs_vals)
 }
 
 #' Bootstrap Quantiles
@@ -49,14 +53,16 @@ bs_median <- function(vec,B = 1000){
 #' \code{bs} a matrix whose columns are the bootstrapped statistics
 #' @importFrom matrixStats colQuantiles
 #' @export
-bs_quantile <- function(vec,probs,B = 1000){
+bs_quantile <- function(vec, probs, B = 1000) {
   n <- length(vec)
   vec <- vec[!is.na(vec)]
-  if (n == 1) return(list(orig = NA,bs = matrix(rep(NA,B*length(probs)),B,length(probs))))
-  orig <- quantile(x = vec,probs = probs)
-  mat <- matrix(vec[sample(n,n*B,replace = TRUE)],nrow = n,ncol = B,byrow = FALSE)
-  bs_vals <- matrixStats::colQuantiles(mat,probs = probs)
-  list(orig = orig,bs = bs_vals)
+  if (n == 1) {
+    return(list(orig = NA, bs = matrix(rep(NA, B * length(probs)), B, length(probs))))
+  }
+  orig <- quantile(x = vec, probs = probs)
+  mat <- matrix(vec[sample(n, n * B, replace = TRUE)], nrow = n, ncol = B, byrow = FALSE)
+  bs_vals <- matrixStats::colQuantiles(mat, probs = probs)
+  list(orig = orig, bs = bs_vals)
 }
 
 #' Bootstrap MAD
@@ -69,12 +75,14 @@ bs_quantile <- function(vec,probs,B = 1000){
 #' \code{bs} a matrix whose columns are the bootstrapped statistics
 #' @importFrom matrixStats colQuantiles
 #' @export
-bs_mads <- function(vec,B = 1000){
+bs_mads <- function(vec, B = 1000) {
   n <- length(vec)
   vec <- vec[!is.na(vec)]
-  if (n == 1) return(list(orig = NA,bs = rep(NA,B),n = n))
+  if (n == 1) {
+    return(list(orig = NA, bs = rep(NA, B), n = n))
+  }
   orig <- mad(vec)
-  mat <- matrix(vec[sample(n,n*B,replace = TRUE)],nrow = n,ncol = B,byrow = FALSE)
+  mat <- matrix(vec[sample(n, n * B, replace = TRUE)], nrow = n, ncol = B, byrow = FALSE)
   bs_vals <- matrixStats::colMads(mat)
-  list(orig = orig,bs = bs_vals,n = n)
+  list(orig = orig, bs = bs_vals, n = n)
 }

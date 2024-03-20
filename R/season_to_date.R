@@ -6,6 +6,6 @@
 #'
 #' @param x character; season to convert
 #' @export
-season_to_date <- function(x){
-  paste0(substr(x,6,9),"-01-01")
+season_to_date <- function(x) {
+  paste0(substr(x, 6, 9), "-01-01")
 }
